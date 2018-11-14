@@ -26,7 +26,7 @@ exports[`components/admin_console/CustomPluginSettings should match snapshot wit
           }
         }
       />
-      <TextSetting
+      <AdminTextSetting
         disabled={false}
         helpText={
           <span>
@@ -36,7 +36,6 @@ exports[`components/admin_console/CustomPluginSettings should match snapshot wit
         id="settinga"
         key="testplugin_text_settinga"
         label="Setting One"
-        maxLength={null}
         onChange={[Function]}
         placeholder="e.g. some setting"
         setByEnv={false}
@@ -302,7 +301,7 @@ exports[`components/admin_console/CustomPluginSettings should match snapshot wit
           }
         }
       />
-      <TextSetting
+      <AdminTextSetting
         disabled={false}
         helpText={
           <span>
@@ -312,7 +311,6 @@ exports[`components/admin_console/CustomPluginSettings should match snapshot wit
         id="settinga"
         key="testplugin_text_settinga"
         label="Setting One"
-        maxLength={null}
         onChange={[Function]}
         placeholder="e.g. some setting"
         setByEnv={false}
