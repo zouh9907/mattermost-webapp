@@ -27,6 +27,13 @@ pipeline {
             }
         }
 
+        stage('Check Translations') {
+            steps {
+                sh 'git clone https://github.com/mattermost/mattermost-utilities.git'
+                sh 'cd mattermost-utilities; npm install; npm run babel; node mmjstool/build/index.js --webapp-dir ../ i18n check-webapp'
+            }
+        }
+
         stage('Test') {
             steps {
                 sh 'make test'
