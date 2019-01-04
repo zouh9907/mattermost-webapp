@@ -6,18 +6,16 @@ import {batchActions} from 'redux-batched-actions';
 
 import {
     createDirectChannel,
-    getChannelByNameAndTeamName,
     getChannelStats,
     getMyChannelMember,
     markChannelAsRead,
-    selectChannel,
 } from 'mattermost-redux/actions/channels';
 import {logout} from 'mattermost-redux/actions/users';
 import {Client4} from 'mattermost-redux/client';
 import {getConfig} from 'mattermost-redux/selectors/entities/general';
-import {getCurrentTeamId, getTeam, getMyTeams, getMyTeamMember} from 'mattermost-redux/selectors/entities/teams';
+import {getCurrentTeamId} from 'mattermost-redux/selectors/entities/teams';
 import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
-import {getCurrentChannelStats, getCurrentChannelId, getChannelByName, getMyChannelMember as selectMyChannelMember} from 'mattermost-redux/selectors/entities/channels';
+import {getCurrentChannelStats, getCurrentChannelId, getMyChannelMember as selectMyChannelMember} from 'mattermost-redux/selectors/entities/channels';
 import {ChannelTypes} from 'mattermost-redux/action_types';
 
 import {browserHistory} from 'utils/browser_history';
@@ -29,7 +27,6 @@ import {clearUserCookie} from 'actions/views/root';
 import {close as closeLhs} from 'actions/views/lhs';
 import * as WebsocketActions from 'actions/websocket_actions.jsx';
 import AppDispatcher from 'dispatcher/app_dispatcher.jsx';
-import {getCurrentLocale} from 'selectors/i18n';
 import {getIsRhsOpen, getRhsState} from 'selectors/rhs';
 import BrowserStore from 'stores/browser_store.jsx';
 import store from 'stores/redux_store.jsx';
@@ -38,7 +35,6 @@ import WebSocketClient from 'client/web_websocket_client.jsx';
 
 import {ActionTypes, Constants, PostTypes, RHSStates} from 'utils/constants.jsx';
 import EventTypes from 'utils/event_types.jsx';
-import {filterAndSortTeamsByDisplayName} from 'utils/team_utils.jsx';
 import * as Utils from 'utils/utils.jsx';
 import {equalServerVersions} from 'utils/server_version';
 
@@ -269,46 +265,6 @@ export function emitBrowserFocus(focus) {
         type: ActionTypes.BROWSER_CHANGE_FOCUS,
         focus,
     });
-}
-
-export async function redirectUserToDefaultTeam() {
-    const state = getState();
-    const userId = getCurrentUserId(state);
-    const locale = getCurrentLocale(state);
-    const teamId = LocalStorageStore.getPreviousTeamId(userId);
-
-    let team = getTeam(state, teamId);
-    const myMember = getMyTeamMember(state, teamId);
-
-    if (!team || !myMember || !myMember.team_id) {
-        team = null;
-        let myTeams = getMyTeams(state);
-
-        if (myTeams.length > 0) {
-            myTeams = filterAndSortTeamsByDisplayName(myTeams, locale);
-            if (myTeams && myTeams[0]) {
-                team = myTeams[0];
-            }
-        }
-    }
-
-    if (userId && team) {
-        let channelName = LocalStorageStore.getPreviousChannelName(userId, teamId);
-        const channel = getChannelByName(state, channelName);
-        if (channel && channel.team_id === team.id) {
-            dispatch(selectChannel(channel.id));
-            channelName = channel.name;
-        } else {
-            const {data} = await dispatch(getChannelByNameAndTeamName(team.name, channelName));
-            if (data) {
-                dispatch(selectChannel(data.id));
-            }
-        }
-
-        browserHistory.push(`/${team.name}/channels/${channelName}`);
-    } else {
-        browserHistory.push('/select_team');
-    }
 }
 
 export const postListScrollChange = debounce(() => {

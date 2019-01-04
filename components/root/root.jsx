@@ -7,12 +7,10 @@ require('perfect-scrollbar/jquery')($);
 import PropTypes from 'prop-types';
 import React from 'react';
 import FastClick from 'fastclick';
-import {Route, Switch, Redirect} from 'react-router-dom';
+
 import {setUrl} from 'mattermost-redux/actions/general';
 import {setSystemEmojis} from 'mattermost-redux/actions/emojis';
-import {getConfig} from 'mattermost-redux/selectors/entities/general';
 
-import * as UserAgent from 'utils/user_agent.jsx';
 import {EmojiIndicesByAlias} from 'utils/emoji.jsx';
 import {trackLoadTime} from 'actions/diagnostics_actions.jsx';
 import * as GlobalActions from 'actions/global_actions.jsx';
@@ -22,69 +20,17 @@ import * as I18n from 'i18n/i18n.jsx';
 import {initializePlugins} from 'plugins';
 import 'plugins/export.js';
 import Constants, {StoragePrefixes} from 'utils/constants.jsx';
-import {HFTRoute, LoggedInHFTRoute} from 'components/header_footer_template_route';
 import IntlProvider from 'components/intl_provider';
-import NeedsTeam from 'components/needs_team';
-import {makeAsyncComponent} from 'components/async_load';
-import loadErrorPage from 'bundle-loader?lazy!components/error_page';
-import loadLoginController from 'bundle-loader?lazy!components/login/login_controller';
-import loadAdminConsole from 'bundle-loader?lazy!components/admin_console';
-import loadLoggedIn from 'bundle-loader?lazy!components/logged_in';
-import loadPasswordResetSendLink from 'bundle-loader?lazy!components/password_reset_send_link';
-import loadPasswordResetForm from 'bundle-loader?lazy!components/password_reset_form';
-import loadSignupController from 'bundle-loader?lazy!components/signup/signup_controller';
-import loadSignupEmail from 'bundle-loader?lazy!components/signup/signup_email';
-import loadTermsOfService from 'bundle-loader?lazy!components/terms_of_service';
-import loadShouldVerifyEmail from 'bundle-loader?lazy!components/should_verify_email';
-import loadDoVerifyEmail from 'bundle-loader?lazy!components/do_verify_email';
-import loadClaimController from 'bundle-loader?lazy!components/claim';
-import loadHelpController from 'bundle-loader?lazy!components/help/help_controller';
-import loadGetIosApp from 'bundle-loader?lazy!components/get_ios_app';
-import loadGetAndroidApp from 'bundle-loader?lazy!components/get_android_app';
-import loadSelectTeam from 'bundle-loader?lazy!components/select_team';
-import loadAuthorize from 'bundle-loader?lazy!components/authorize';
-import loadCreateTeam from 'bundle-loader?lazy!components/create_team';
-import loadMfa from 'bundle-loader?lazy!components/mfa/mfa_controller';
 import store from 'stores/redux_store.jsx';
 import {getSiteURL} from 'utils/url.jsx';
 
-const CreateTeam = makeAsyncComponent(loadCreateTeam);
-const ErrorPage = makeAsyncComponent(loadErrorPage);
-const TermsOfService = makeAsyncComponent(loadTermsOfService);
-const LoginController = makeAsyncComponent(loadLoginController);
-const AdminConsole = makeAsyncComponent(loadAdminConsole);
-const LoggedIn = makeAsyncComponent(loadLoggedIn);
-const PasswordResetSendLink = makeAsyncComponent(loadPasswordResetSendLink);
-const PasswordResetForm = makeAsyncComponent(loadPasswordResetForm);
-const SignupController = makeAsyncComponent(loadSignupController);
-const SignupEmail = makeAsyncComponent(loadSignupEmail);
-const ShouldVerifyEmail = makeAsyncComponent(loadShouldVerifyEmail);
-const DoVerifyEmail = makeAsyncComponent(loadDoVerifyEmail);
-const ClaimController = makeAsyncComponent(loadClaimController);
-const HelpController = makeAsyncComponent(loadHelpController);
-const GetIosApp = makeAsyncComponent(loadGetIosApp);
-const GetAndroidApp = makeAsyncComponent(loadGetAndroidApp);
-const SelectTeam = makeAsyncComponent(loadSelectTeam);
-const Authorize = makeAsyncComponent(loadAuthorize);
-const Mfa = makeAsyncComponent(loadMfa);
-
-const LoggedInRoute = ({component: Component, ...rest}) => (
-    <Route
-        {...rest}
-        render={(props) => (
-            <LoggedIn {...props}>
-                <Component {...props}/>
-            </LoggedIn>
-        )}
-    />
-);
+import RootSwitch from './switch';
 
 export default class Root extends React.Component {
     static propTypes = {
         diagnosticsEnabled: PropTypes.bool,
         diagnosticId: PropTypes.string,
         noAccounts: PropTypes.bool,
-        showTermsOfService: PropTypes.bool,
         actions: PropTypes.shape({
             loadMeAndConfig: PropTypes.func.isRequired,
         }).isRequired,
@@ -184,10 +130,6 @@ export default class Root extends React.Component {
         const afterIntl = () => {
             initializePlugins();
 
-            if (this.props.location.pathname === '/' && this.props.noAccounts) {
-                this.props.history.push('/signup_user_complete');
-            }
-
             this.setState({configLoaded: true});
         };
         if (global.Intl) {
@@ -197,43 +139,10 @@ export default class Root extends React.Component {
         }
 
         loadRecentlyUsedCustomEmojis()(store.dispatch, store.getState);
-
-        const iosDownloadLink = getConfig(store.getState()).IosAppDownloadLink;
-        const androidDownloadLink = getConfig(store.getState()).AndroidAppDownloadLink;
-
-        const toResetPasswordScreen = this.props.location.pathname === '/reset_password_complete';
-
-        // redirect to the mobile landing page if the user hasn't seen it before
-        if (iosDownloadLink && UserAgent.isIosWeb() && !BrowserStore.hasSeenLandingPage() && !toResetPasswordScreen) {
-            this.props.history.push('/get_ios_app?redirect_to=' + encodeURIComponent(this.props.location.pathname) + encodeURIComponent(this.props.location.search));
-            BrowserStore.setLandingPageSeen(true);
-        } else if (androidDownloadLink && UserAgent.isAndroidWeb() && !BrowserStore.hasSeenLandingPage() && !toResetPasswordScreen) {
-            this.props.history.push('/get_android_app?redirect_to=' + encodeURIComponent(this.props.location.pathname) + encodeURIComponent(this.props.location.search));
-            BrowserStore.setLandingPageSeen(true);
-        }
-    }
-
-    redirectIfNecessary = (props) => {
-        if (props.location.pathname === '/') {
-            if (this.props.noAccounts) {
-                this.props.history.push('/signup_user_complete');
-            } else if (props.showTermsOfService) {
-                this.props.history.push('/terms_of_service');
-            }
-        }
-    }
-
-    UNSAFE_componentWillReceiveProps(newProps) { // eslint-disable-line camelcase
-        this.redirectIfNecessary(newProps);
     }
 
     componentDidMount() {
-        this.props.actions.loadMeAndConfig().then((response) => {
-            if (this.props.location.pathname === '/' && response[2] && response[2].data) {
-                GlobalActions.redirectUserToDefaultTeam();
-            }
-            this.onConfigLoaded();
-        });
+        this.props.actions.loadMeAndConfig().then(this.onConfigLoaded);
         trackLoadTime();
     }
 
@@ -248,90 +157,7 @@ export default class Root extends React.Component {
 
         return (
             <IntlProvider>
-                <Switch>
-                    <Route
-                        path={'/error'}
-                        component={ErrorPage}
-                    />
-                    <HFTRoute
-                        path={'/login'}
-                        component={LoginController}
-                    />
-                    <HFTRoute
-                        path={'/reset_password'}
-                        component={PasswordResetSendLink}
-                    />
-                    <HFTRoute
-                        path={'/reset_password_complete'}
-                        component={PasswordResetForm}
-                    />
-                    <HFTRoute
-                        path={'/signup_user_complete'}
-                        component={SignupController}
-                    />
-                    <HFTRoute
-                        path={'/signup_email'}
-                        component={SignupEmail}
-                    />
-                    <HFTRoute
-                        path={'/should_verify_email'}
-                        component={ShouldVerifyEmail}
-                    />
-                    <HFTRoute
-                        path={'/do_verify_email'}
-                        component={DoVerifyEmail}
-                    />
-                    <HFTRoute
-                        path={'/claim'}
-                        component={ClaimController}
-                    />
-                    <HFTRoute
-                        path={'/help'}
-                        component={HelpController}
-                    />
-                    <LoggedInRoute
-                        path={'/terms_of_service'}
-                        component={TermsOfService}
-                    />
-                    <Route
-                        path={'/get_ios_app'}
-                        component={GetIosApp}
-                    />
-                    <Route
-                        path={'/get_android_app'}
-                        component={GetAndroidApp}
-                    />
-                    <LoggedInRoute
-                        path={'/admin_console'}
-                        component={AdminConsole}
-                    />
-                    <LoggedInHFTRoute
-                        path={'/select_team'}
-                        component={SelectTeam}
-                    />
-                    <LoggedInHFTRoute
-                        path={'/oauth/authorize'}
-                        component={Authorize}
-                    />
-                    <LoggedInHFTRoute
-                        path={'/create_team'}
-                        component={CreateTeam}
-                    />
-                    <LoggedInRoute
-                        path={'/mfa'}
-                        component={Mfa}
-                    />
-                    <LoggedInRoute
-                        path={'/:team'}
-                        component={NeedsTeam}
-                    />
-                    <Redirect
-                        to={{
-                            ...this.props.location,
-                            pathname: '/login',
-                        }}
-                    />
-                </Switch>
+                <RootSwitch/>
             </IntlProvider>
         );
     }

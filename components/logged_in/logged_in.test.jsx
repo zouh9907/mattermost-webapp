@@ -14,12 +14,10 @@ describe('components/logged_in/LoggedIn', () => {
     const children = <span>{'Test'}</span>;
     const baseProps = {
         currentUser: {},
-        mfaRequired: false,
         enableTimezone: false,
         actions: {
             autoUpdateTimezone: jest.fn(),
         },
-        showTermsOfService: false,
         location: {
             pathname: '/',
         },
@@ -42,113 +40,113 @@ describe('components/logged_in/LoggedIn', () => {
         );
     });
 
-    it('should redirect to mfa when required and not on /mfa/setup', () => {
-        const props = {
-            ...baseProps,
-            mfaRequired: true,
-        };
+    // it('should redirect to mfa when required and not on /mfa/setup', () => {
+    //     const props = {
+    //         ...baseProps,
+    //         mfaRequired: true,
+    //     };
 
-        const wrapper = shallow(<LoggedIn {...props}>{children}</LoggedIn>);
+    //     const wrapper = shallow(<LoggedIn {...props}>{children}</LoggedIn>);
 
-        expect(wrapper).toMatchInlineSnapshot(`
-<Redirect
-  push={false}
-  to="/mfa/setup"
-/>
-`
-        );
-    });
+    //     expect(wrapper).toMatchInlineSnapshot(`
+// <Redirect
+  // push={false}
+  // to="/mfa/setup"
+// />
+// `
+    //     );
+    // });
 
-    it('should render children when mfa required and already on /mfa/setup', () => {
-        const props = {
-            ...baseProps,
-            mfaRequired: true,
-            location: {
-                pathname: '/mfa/setup',
-            },
-        };
+    // it('should render children when mfa required and already on /mfa/setup', () => {
+    //     const props = {
+    //         ...baseProps,
+    //         mfaRequired: true,
+    //         location: {
+    //             pathname: '/mfa/setup',
+    //         },
+    //     };
 
-        const wrapper = shallow(<LoggedIn {...props}>{children}</LoggedIn>);
+    //     const wrapper = shallow(<LoggedIn {...props}>{children}</LoggedIn>);
 
-        expect(wrapper).toMatchInlineSnapshot(`
-<span>
-  Test
-</span>
-`
-        );
-    });
+    //     expect(wrapper).toMatchInlineSnapshot(`
+// <span>
+  // Test
+// </span>
+// `
+    //     );
+    // });
 
-    it('should render children when mfa is not required and on /mfa/confirm', () => {
-        const props = {
-            ...baseProps,
-            mfaRequired: false,
-            location: {
-                pathname: '/mfa/confirm',
-            },
-        };
+    // it('should render children when mfa is not required and on /mfa/confirm', () => {
+    //     const props = {
+    //         ...baseProps,
+    //         mfaRequired: false,
+    //         location: {
+    //             pathname: '/mfa/confirm',
+    //         },
+    //     };
 
-        const wrapper = shallow(<LoggedIn {...props}>{children}</LoggedIn>);
+    //     const wrapper = shallow(<LoggedIn {...props}>{children}</LoggedIn>);
 
-        expect(wrapper).toMatchInlineSnapshot(`
-<span>
-  Test
-</span>
-`
-        );
-    });
+    //     expect(wrapper).toMatchInlineSnapshot(`
+// <span>
+  // Test
+// </span>
+// `
+    //     );
+    // });
 
-    it('should redirect to terms of service when mfa not required and terms of service required but not on /terms_of_service', () => {
-        const props = {
-            ...baseProps,
-            mfaRequired: false,
-            showTermsOfService: true,
-        };
+    // it('should redirect to terms of service when mfa not required and terms of service required but not on /terms_of_service', () => {
+    //     const props = {
+    //         ...baseProps,
+    //         mfaRequired: false,
+    //         showTermsOfService: true,
+    //     };
 
-        const wrapper = shallow(<LoggedIn {...props}>{children}</LoggedIn>);
+    //     const wrapper = shallow(<LoggedIn {...props}>{children}</LoggedIn>);
 
-        expect(wrapper).toMatchInlineSnapshot(`
-<Redirect
-  push={false}
-  to="/terms_of_service?redirect_to=%2F"
-/>
-`
-        );
-    });
+    //     expect(wrapper).toMatchInlineSnapshot(`
+// <Redirect
+  // push={false}
+  // to="/terms_of_service?redirect_to=%2F"
+// />
+// `
+    //     );
+    // });
 
-    it('should render children when mfa is not required and terms of service required and on /terms_of_service', () => {
-        const props = {
-            ...baseProps,
-            mfaRequired: false,
-            showTermsOfService: true,
-            location: {
-                pathname: '/terms_of_service',
-            },
-        };
+    // it('should render children when mfa is not required and terms of service required and on /terms_of_service', () => {
+    //     const props = {
+    //         ...baseProps,
+    //         mfaRequired: false,
+    //         showTermsOfService: true,
+    //         location: {
+    //             pathname: '/terms_of_service',
+    //         },
+    //     };
 
-        const wrapper = shallow(<LoggedIn {...props}>{children}</LoggedIn>);
+    //     const wrapper = shallow(<LoggedIn {...props}>{children}</LoggedIn>);
 
-        expect(wrapper).toMatchInlineSnapshot(`
-<span>
-  Test
-</span>
-`
-        );
-    });
+    //     expect(wrapper).toMatchInlineSnapshot(`
+// <span>
+  // Test
+// </span>
+// `
+    //     );
+    // });
 
-    it('should render children when neither mfa nor terms of service required', () => {
-        const props = {
-            ...baseProps,
-            mfaRequired: false,
-            showTermsOfService: false,
-        };
+    // it('should render children when neither mfa nor terms of service required', () => {
+    //     const props = {
+    //         ...baseProps,
+    //         mfaRequired: false,
+    //         showTermsOfService: false,
+    //     };
 
-        const wrapper = shallow(<LoggedIn {...props}>{children}</LoggedIn>);
+    //     const wrapper = shallow(<LoggedIn {...props}>{children}</LoggedIn>);
 
-        expect(wrapper).toMatchInlineSnapshot(`
-<span>
-  Test
-</span>
-`
-        );
-    });
+    //     expect(wrapper).toMatchInlineSnapshot(`
+// <span>
+  // Test
+// </span>
+// `
+    //     );
+    // });
 });

@@ -514,7 +514,7 @@ function handleLeaveTeamEvent(msg) {
         // if they are on the team being removed redirect them to default team
         if (getCurrentTeamId(state) === msg.data.team_id) {
             if (!global.location.pathname.startsWith('/admin_console')) {
-                GlobalActions.redirectUserToDefaultTeam();
+                browserHistory.push('/');
             }
         }
     }
@@ -845,7 +845,7 @@ function handleUserRoleUpdated(msg) {
         store.dispatch({type: UserTypes.RECEIVED_PROFILE, data: {...user, roles}});
 
         if (demoted && global.location.pathname.startsWith('/admin_console')) {
-            GlobalActions.redirectUserToDefaultTeam();
+            browserHistory.push('/');
         }
     }
 }

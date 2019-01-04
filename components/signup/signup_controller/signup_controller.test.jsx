@@ -10,10 +10,6 @@ import {Constants} from 'utils/constants.jsx';
 
 import SignupController from './signup_controller.jsx';
 
-jest.mock('actions/global_actions', () => ({
-    redirectUserToDefaultTeam: jest.fn(),
-}));
-
 jest.mock('utils/browser_history', () => ({
     browserHistory: {
         push: jest.fn(),
@@ -90,7 +86,8 @@ describe('components/SignupController', () => {
         expect(wrapper).toMatchSnapshot();
         expect(addUserToTeamFromInvite).toHaveBeenCalled();
         expect(getInviteInfo).not.toHaveBeenCalled();
-        expect(GlobalActions.redirectUserToDefaultTeam).not.toHaveBeenCalled();
+
+        // TODO: test redirect to '/' in other test?
 
         await addUserToTeamFromInvite();
         expect(browserHistory.push).toHaveBeenCalledWith(`/defaultTeam/channels/${Constants.DEFAULT_CHANNEL}`);

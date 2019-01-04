@@ -120,12 +120,7 @@ export default class SignupEmail extends React.Component {
                 this.props.actions.setGlobalItem(this.state.token, JSON.stringify({usedBefore: true}));
             }
 
-            const redirectTo = (new URLSearchParams(this.props.location.search)).get('redirect_to');
-            if (redirectTo) {
-                browserHistory.push(redirectTo);
-            } else {
-                GlobalActions.redirectUserToDefaultTeam();
-            }
+            this.props.history.push('/');
         });
     }
 

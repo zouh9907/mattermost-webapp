@@ -86,7 +86,7 @@ class LoginController extends React.Component {
         this.configureTitle();
 
         if (this.props.currentUser) {
-            GlobalActions.redirectUserToDefaultTeam();
+            this.props.history.push('/');
             return;
         }
 
@@ -325,21 +325,14 @@ class LoginController extends React.Component {
     }
 
     finishSignin = (team) => {
-        const experimentalPrimaryTeam = this.props.experimentalPrimaryTeam;
-        const query = new URLSearchParams(this.props.location.search);
-        const redirectTo = query.get('redirect_to');
-
         // Record a successful login to local storage. If an unintentional logout occurs, e.g.
         // via session expiration, this bit won't get reset and we can notify the user as such.
         LocalStorageStore.setWasLoggedIn(true);
-        if (redirectTo && redirectTo.match(/^\/([^/]|$)/)) {
-            browserHistory.push(redirectTo);
-        } else if (team) {
+
+        if (team) {
             browserHistory.push(`/${team.name}`);
-        } else if (experimentalPrimaryTeam) {
-            browserHistory.push(`/${experimentalPrimaryTeam}/channels/${Constants.DEFAULT_CHANNEL}`);
         } else {
-            GlobalActions.redirectUserToDefaultTeam();
+            browserHistory.push('/');
         }
     }
 

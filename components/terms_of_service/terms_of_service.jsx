@@ -13,11 +13,11 @@ import AnnouncementBar from 'components/announcement_bar';
 import LoadingScreen from 'components/loading_screen.jsx';
 import LoadingSpinner from 'components/widgets/loading/loading_spinner.jsx';
 
-import {browserHistory} from 'utils/browser_history';
 import messageHtmlToComponent from 'utils/message_html_to_component';
 import {formatText} from 'utils/text_formatting.jsx';
 import * as Utils from 'utils/utils.jsx';
 import {Constants} from 'utils/constants.jsx';
+import {defaultRedirect} from 'utils/route.jsx';
 
 export default class TermsOfService extends React.PureComponent {
     static propTypes = {
@@ -48,7 +48,7 @@ export default class TermsOfService extends React.PureComponent {
         if (this.props.termsEnabled) {
             this.getTermsOfService();
         } else {
-            GlobalActions.redirectUserToDefaultTeam();
+            defaultRedirect(this.props.location.search);
         }
     }
 
@@ -83,13 +83,7 @@ export default class TermsOfService extends React.PureComponent {
         this.registerUserAction(
             true,
             () => {
-                const query = new URLSearchParams(this.props.location.search);
-                const redirectTo = query.get('redirect_to');
-                if (redirectTo && redirectTo.match(/^\/([^/]|$)/)) {
-                    browserHistory.push(redirectTo);
-                } else {
-                    GlobalActions.redirectUserToDefaultTeam();
-                }
+                defaultRedirect(this.props.location.search);
             }
         );
     };

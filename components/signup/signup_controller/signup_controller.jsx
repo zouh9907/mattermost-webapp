@@ -99,7 +99,7 @@ export default class SignupController extends React.Component {
             } else if (inviteId) {
                 this.getInviteInfo(inviteId);
             } else if (userLoggedIn) {
-                GlobalActions.redirectUserToDefaultTeam();
+                this.props.history.push('/');
             }
         }
     }
