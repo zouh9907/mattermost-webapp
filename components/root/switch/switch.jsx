@@ -10,6 +10,7 @@ import NeedsTeam from 'components/needs_team';
 import {makeAsyncComponent} from 'components/async_load';
 import BrowserStore from 'stores/browser_store.jsx';
 import * as UserAgent from 'utils/user_agent.jsx';
+import LoadingScreen from 'components/loading_screen.jsx';
 
 import loadErrorPage from 'bundle-loader?lazy!components/error_page';
 import loadLoginController from 'bundle-loader?lazy!components/login/login_controller';
@@ -64,12 +65,50 @@ const LoggedInRoute = ({component: Component, ...rest}) => (
 
 export default class RootSwitch extends React.PureComponent {
     static propTypes = {
+        currentUserId: PropTypes.string,
         defaultRoute: PropTypes.string.isRequired,
         noAccounts: PropTypes.bool.isRequired,
         mfaRequired: PropTypes.bool.isRequired,
         showTermsOfService: PropTypes.bool.isRequired,
         iosDownloadLink: PropTypes.string,
         androidDownloadLink: PropTypes.string,
+    }
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            currentUserIdSet: 0,
+            showTermsOfServiceSet: 0,
+        };
+    }
+
+    componentDidUpdate(prevProps) {
+        /* eslint-disable react/no-did-update-set-state */
+
+        // Record the time when the currentUserId is first set.
+        if (!prevProps.currentUserId && this.props.currentUserId) {
+            this.setState({
+                currentUserIdSet: Date.now(),
+            });
+        }
+
+        // Record the time when showTermsOfService is first set.
+        if (!prevProps.showTermsOfService && this.props.showTermsOfService) {
+            this.setState({
+                showTermsOfServiceSet: Date.now(),
+            });
+        }
+    }
+
+    shouldShowTermsOfService() {
+        // Honour a request to show terms of service only within 15 seconds of transitioning to
+        // the logged in state with the showTermsOfService bit set. This prevents forcing all users
+        // through the terms of service flow when enabled until they next login or refresh the
+        // page.
+        return this.props.showTermsOfService &&
+               this.state.showTermsOfServiceSet > 0 &&
+               Math.abs(this.state.showTermsOfServiceSet - this.state.currentUserIdSet) < 15 * 1000;
     }
 
     render() {
@@ -167,7 +206,7 @@ export default class RootSwitch extends React.PureComponent {
                 component={TermsOfService}
             />
         );
-        if (this.props.showTermsOfService) {
+        if (this.shouldShowTermsOfService()) {
             routes.push(
                 <Redirect
                     key='/terms_of_service?redirect_to'
@@ -248,14 +287,29 @@ export default class RootSwitch extends React.PureComponent {
                 path={'/:team'}
                 component={NeedsTeam}
             />,
+        ]);
+
+        // If the defaultRoute is '/`, there is insufficient data to determine where to route the
+        // user. Render a loading screen until the defaultRoute changes.
+        if (this.props.defaultRoute === '/') {
+            routes.push(
+                <Route
+                    key={'/'}
+                    path={'/'}
+                    component={LoadingScreen}
+                />
+            );
+        }
+
+        routes.push(
             <Redirect
                 key={'/default'}
                 to={{
                     ...this.props.location,
                     pathname: this.props.defaultRoute,
                 }}
-            />,
-        ]);
+            />
+        );
 
         return (
             <Switch>

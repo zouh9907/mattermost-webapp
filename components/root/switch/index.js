@@ -25,13 +25,18 @@ function defaultRoute(state) {
     const teamId = LocalStorageStore.getPreviousTeamId(userId);
     const locale = getCurrentLocale(state);
 
+    // Don't compute a default until we have successfully received our teams.
+    if (state.requests.teams.getMyTeams.status !== 'success') {
+        return '/';
+    }
+
     let team = getTeam(state, teamId);
     const myMember = getMyTeamMember(state, teamId);
 
     if (!team || !myMember || !myMember.team_id) {
         team = null;
-        let myTeams = getMyTeams(state);
 
+        let myTeams = getMyTeams(state);
         if (myTeams.length > 0) {
             myTeams = filterAndSortTeamsByDisplayName(myTeams, locale);
             if (myTeams && myTeams[0]) {
@@ -58,6 +63,7 @@ function mapStateToProps(state) {
     const config = getConfig(state);
 
     return {
+        currentUserId: getCurrentUserId(state),
         defaultRoute: defaultRoute(state),
         noAccounts: config.NoAccounts === 'true',
         mfaRequired: checkIfMFARequired(getCurrentUser(state), license, config),
