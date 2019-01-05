@@ -56,10 +56,8 @@ function defaultRoute(state) {
 function mapStateToProps(state) {
     const license = getLicense(state);
     const config = getConfig(state);
-    const currentUserId = getCurrentUserId(state);
 
     return {
-        currentUserId,
         defaultRoute: defaultRoute(state),
         noAccounts: config.NoAccounts === 'true',
         mfaRequired: checkIfMFARequired(getCurrentUser(state), license, config),
