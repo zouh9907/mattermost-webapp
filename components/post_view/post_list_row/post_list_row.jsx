@@ -16,6 +16,7 @@ export default class PostListRow extends React.PureComponent {
         listId: PropTypes.string.isRequired,
         channel: PropTypes.object,
         fullWidth: PropTypes.bool,
+        shouldHighlight: PropTypes.bool,
     }
 
     render() {
@@ -26,6 +27,7 @@ export default class PostListRow extends React.PureComponent {
                     ref={post.id}
                     key={'post ' + (post.id || post.pending_post_id)}
                     post={post}
+                    shouldHighlight={this.props.shouldHighlight}
                 />
             );
         }

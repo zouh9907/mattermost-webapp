@@ -59,7 +59,8 @@ export function makePreparePostIdsForPostList() {
                 return [];
             }
 
-            const out = [];
+            const postIds = [];
+            const postsObjById = {};
 
             let lastDate = null;
             let addedNewMessagesIndicator = false;
@@ -85,8 +86,7 @@ export function makePreparePostIdsForPostList() {
                 postDate.setHours(0, 0, 0, 0);
 
                 if (!lastDate || lastDate.toDateString() !== postDate.toDateString()) {
-                    out.unshift(PostListSeparators.DATE_LINE + postDate);
-
+                    postIds.unshift(PostListSeparators.DATE_LINE + postDate);
                     lastDate = postDate;
                 }
 
@@ -98,14 +98,17 @@ export function makePreparePostIdsForPostList() {
                     indicateNewMessages
                 ) {
                     // Added postId to solve ie11 rendering issue
-                    out.unshift(PostListSeparators.START_OF_NEW_MESSAGES + post.id);
+                    postIds.unshift(PostListSeparators.START_OF_NEW_MESSAGES + post.id);
                     addedNewMessagesIndicator = true;
                 }
-
-                out.unshift(post.id);
+                postIds.unshift(post.id);
+                postsObjById[post.id] = post;
             }
 
-            return out;
+            return {
+                postIds,
+                postsObjById,
+            };
         }
     );
 }
