@@ -225,7 +225,7 @@ export default class PostList extends React.PureComponent {
     }
 
     onScroll = ({scrollDirection, scrollOffset, scrollUpdateWasRequested}) => {
-        if (scrollDirection === 'backward' && scrollOffset < 200 && !this.loadingPosts && !scrollUpdateWasRequested && !this.state.atEnd && !this.state.isDoingInitialLoad) {
+        if (scrollDirection === 'backward' && scrollOffset < 600 && !this.loadingPosts && !scrollUpdateWasRequested && !this.state.atEnd && !this.state.isDoingInitialLoad) {
             this.loadingPosts = true;
             this.loadMorePosts();
         }
