@@ -9,7 +9,7 @@ import {createIdsSelector} from 'mattermost-redux/utils/helpers';
 import {getCurrentUser} from 'mattermost-redux/selectors/entities/common';
 
 import {getGlobalItem} from 'selectors/storage';
-import {Preferences, StoragePrefixes, PostTypes, PostListSeparators} from 'utils/constants';
+import {Preferences, StoragePrefixes, PostTypes, PostListRowListIds} from 'utils/constants';
 
 export const getEditingPost = createSelector(
     (state) => {
@@ -56,7 +56,10 @@ export function makePreparePostIdsForPostList() {
         shouldShowJoinLeaveMessages,
         (posts, selectedPostId, lastViewedAt, indicateNewMessages, currentUser, showJoinLeave) => {
             if (!posts || posts.length === 0 || !currentUser) {
-                return [];
+                return {
+                    postIds: [],
+                    postsObjById: {},
+                };
             }
 
             const postIds = [];
@@ -86,7 +89,7 @@ export function makePreparePostIdsForPostList() {
                 postDate.setHours(0, 0, 0, 0);
 
                 if (!lastDate || lastDate.toDateString() !== postDate.toDateString()) {
-                    postIds.unshift(PostListSeparators.DATE_LINE + postDate);
+                    postIds.unshift(PostListRowListIds.DATE_LINE + postDate);
                     lastDate = postDate;
                 }
 
@@ -98,7 +101,7 @@ export function makePreparePostIdsForPostList() {
                     indicateNewMessages
                 ) {
                     // Added postId to solve ie11 rendering issue
-                    postIds.unshift(PostListSeparators.START_OF_NEW_MESSAGES + post.id);
+                    postIds.unshift(PostListRowListIds.START_OF_NEW_MESSAGES + post.id);
                     addedNewMessagesIndicator = true;
                 }
                 postIds.unshift(post.id);

@@ -8,7 +8,7 @@ import Post from 'components/post_view/post';
 import DateSeparator from 'components/post_view/date_separator';
 import NewMessageSeparator from 'components/post_view/new_message_separator';
 import CreateChannelIntroMessage from 'components/post_view/channel_intro_message/';
-import {PostListSeparators} from 'utils/constants';
+import {PostListRowListIds} from 'utils/constants';
 
 export default class PostListRow extends React.PureComponent {
     static propTypes = {
@@ -32,8 +32,8 @@ export default class PostListRow extends React.PureComponent {
             );
         }
 
-        if (listId.indexOf(PostListSeparators.DATE_LINE) === 0) {
-            const postDay = new Date(listId.split(PostListSeparators.DATE_LINE)[1]);
+        if (listId.indexOf(PostListRowListIds.DATE_LINE) === 0) {
+            const postDay = new Date(listId.split(PostListRowListIds.DATE_LINE)[1]);
             return (
                 <DateSeparator
                     key={listId}
@@ -42,13 +42,13 @@ export default class PostListRow extends React.PureComponent {
             );
         }
 
-        if (listId.indexOf(PostListSeparators.START_OF_NEW_MESSAGES) === 0) {
+        if (listId === PostListRowListIds.START_OF_NEW_MESSAGES) {
             return (
                 <NewMessageSeparator separatorId={listId}/>
             );
         }
 
-        if (listId === 'CHANNEL_INTRO_MESSAGE') {
+        if (listId === PostListRowListIds.CHANNEL_INTRO_MESSAGE) {
             return (
                 <CreateChannelIntroMessage
                     channel={this.props.channel}
@@ -57,7 +57,7 @@ export default class PostListRow extends React.PureComponent {
             );
         }
 
-        if (listId === 'MORE_MESSAGES_LOADER') {
+        if (listId === PostListRowListIds.MORE_MESSAGES_LOADER) {
             return (
                 <div
                     className='loading-screen'

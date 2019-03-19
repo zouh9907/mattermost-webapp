@@ -6,7 +6,7 @@ import React from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import {DynamicSizeList} from 'react-window';
 
-import Constants, {PostListSeparators} from 'utils/constants.jsx';
+import Constants, {PostListRowListIds} from 'utils/constants.jsx';
 import DelayedAction from 'utils/delayed_action.jsx';
 import * as Utils from 'utils/utils.jsx';
 import {getClosestValidPostIndex} from 'utils/post_utils.jsx';
@@ -103,7 +103,7 @@ export default class PostList extends React.PureComponent {
         this.loadingPosts = false;
         this.extraPagesLoaded = 0;
         const showLoader = !props.posts;
-
+        const channelIntroMessage = PostListRowListIds.CHANNEL_INTRO_MESSAGE;
         this.state = {
             atEnd: false,
             showLoader,
@@ -113,6 +113,8 @@ export default class PostList extends React.PureComponent {
             isMobile: Utils.isMobile(),
             atBottom: true,
             unViewedCount: 0,
+            postListIds: [channelIntroMessage],
+            postsObjById: {channelIntroMessage},
         };
 
         this.listRef = React.createRef();
@@ -156,15 +158,15 @@ export default class PostList extends React.PureComponent {
             let newPostListIds;
             if (state.atEnd) {
                 return {
-                    postListIds: [...props.postListIds, 'CHANNEL_INTRO_MESSAGE'],
+                    postListIds: [...props.postListIds, PostListRowListIds.CHANNEL_INTRO_MESSAGE],
                 };
             }
             if (props.postVisibility >= Constants.MAX_POST_VISIBILITY) {
-                newPostListIds = [...postListIds, 'MAX_MESSAGES_LOADED'];
+                newPostListIds = [...postListIds, PostListRowListIds.MAX_MESSAGES_LOADED];
             } else if (state.autoRetryEnable) {
-                newPostListIds = [...postListIds, 'MORE_MESSAGES_LOADER'];
+                newPostListIds = [...postListIds, PostListRowListIds.MORE_MESSAGES_LOADER];
             } else {
-                newPostListIds = [...postListIds, 'MANUAL_TRIGGER_LOAD_MESSAGES'];
+                newPostListIds = [...postListIds, PostListRowListIds.MANUAL_TRIGGER_LOAD_MESSAGES];
             }
             return {
                 postListIds: newPostListIds,
@@ -274,7 +276,7 @@ export default class PostList extends React.PureComponent {
     onScroll = ({scrollDirection, scrollOffset, scrollUpdateWasRequested}) => {
         const isNotLoadingPosts = !this.state.showLoader && !this.loadingPosts;
         const didUserScrollBackwards = scrollDirection === 'backward' && !scrollUpdateWasRequested;
-        const isOffsetWithInRange = scrollOffset < 1000; //initial offset will be 0 before the desired first scroll position
+        const isOffsetWithInRange = scrollOffset < 1000 || window.scrollOfsetHelper; //initial offset will be 0 before the desired first scroll position
         if (isNotLoadingPosts && didUserScrollBackwards && isOffsetWithInRange && !this.state.atEnd) {
             this.loadingPosts = true;
             this.loadMorePosts();
@@ -348,7 +350,7 @@ export default class PostList extends React.PureComponent {
             };
         }
         const newMessagesSeparatorIndex = this.state.postListIds.findIndex(
-            (item) => item.indexOf(PostListSeparators.START_OF_NEW_MESSAGES) === 0
+            (item) => item.indexOf(PostListRowListIds.START_OF_NEW_MESSAGES) === 0
         );
         if (newMessagesSeparatorIndex > 0) {
             return {
