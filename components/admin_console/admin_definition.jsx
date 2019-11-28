@@ -4388,6 +4388,12 @@ const AdminDefinition = {
                         help_text_markdown: false,
                         placeholder: t('admin.experimental.userStatusAwayTimeout.example'),
                         placeholder_default: 'E.g.: "300"',
+                    },
+                    {
+                        type: Constants.SettingsTypes.TYPE_TEXT,
+                        key: 'PluginSettings.CanaryTag',
+                        label: t('admin.experimental.canaryTag.title'),
+                        label_default: 'Canary Tag For Testing Plugins:',
                     }, // eslint-disable-next-line lines-around-comment
                     // {
                     //     type: Constants.SettingsTypes.TYPE_BOOL,
