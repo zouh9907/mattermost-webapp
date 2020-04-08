@@ -7,6 +7,9 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
+// Stage: @prod
+// Group: @guest_account
+
 /**
  * Note: This test requires Enterprise license to be uploaded
  */
@@ -21,9 +24,6 @@ function invitePeople(typeText, resultsCount, verifyText) {
     // # Open Invite People
     cy.get('#sidebarHeaderDropdownButton').should('be.visible').click();
     cy.get('#invitePeople').should('be.visible').click();
-
-    // #Click on the next icon to invite new member
-    cy.findByTestId('inviteMembersLink').find('.arrow').click();
 
     // # Search and add a member
     cy.findByTestId('inputPlaceholder').should('be.visible').within(($el) => {
@@ -49,7 +49,7 @@ function verifyInvitationError(user, errorText) {
             cy.wrap($subel).find('.username-or-icon').should('contain', user);
             cy.wrap($subel).find('.reason').should('have.text', errorText);
         });
-        cy.wrap($el).find('.confirm-done > button').should('be.visible').and('not.be.disabled').click();
+        cy.wrap($el).find('.confirm-done').should('be.visible').and('not.be.disabled').click();
     });
 
     // * Verify if Invitation Modal was closed
@@ -69,7 +69,7 @@ function verifyInvitationSuccess(user, successText) {
             cy.wrap($subel).find('.username-or-icon').should('contain', user);
             cy.wrap($subel).find('.reason').should('have.text', successText);
         });
-        cy.wrap($el).find('.confirm-done > button').should('be.visible').and('not.be.disabled').click();
+        cy.wrap($el).find('.confirm-done').should('be.visible').and('not.be.disabled').click();
     });
 
     // * Verify if Invitation Modal was closed
@@ -78,6 +78,10 @@ function verifyInvitationSuccess(user, successText) {
 
 describe('Guest Account - Member Invitation Flow', () => {
     before(() => {
+        // * Check if server has license for Guest Accounts
+        cy.apiLogin('sysadmin');
+        cy.requireLicenseForFeature('GuestAccounts');
+
         // # Enable Guest Account Settings
         cy.apiUpdateConfig({
             GuestAccountsSettings: {
@@ -85,16 +89,13 @@ describe('Guest Account - Member Invitation Flow', () => {
             },
             ServiceSettings: {
                 EnableEmailInvitations: true,
+                IdleTimeout: 300,
             },
         });
-
-        // # Login as "sysadmin" and go to /
-        cy.apiLogin('sysadmin');
 
         // # Create new team and visit its URL
         cy.apiCreateTeam('test-team', 'Test Team').then((response) => {
             testTeam = response.body;
-            cy.visit('/');
             cy.visit(`/${testTeam.name}`);
         });
     });
@@ -131,13 +132,13 @@ describe('Guest Account - Member Invitation Flow', () => {
 
         // * Verify the header has changed in the modal
         cy.findByTestId('invitationModal').within(($el) => {
-            cy.wrap($el).find('h1').should('have.text', 'Invite Members');
+            cy.wrap($el).find('h1').should('have.text', 'Invite Members to Test Team');
         });
 
         // * Verify Share Link Header and helper text
         cy.findByTestId('shareLink').should('be.visible').within(($el) => {
             cy.wrap($el).find('h2 > span').should('have.text', 'Share This Link');
-            cy.wrap($el).find('.help-text > span').should('have.text', 'Share this link to grant member access to this team.');
+            cy.wrap($el).find('.help-text > span').should('have.text', 'Share this link to invite people to this team.');
         });
 
         // * Verify Share Link Input field
@@ -154,8 +155,8 @@ describe('Guest Account - Member Invitation Flow', () => {
 
         // * Verify Invite People field
         cy.findByTestId('searchAdd').should('be.visible').within(($el) => {
-            cy.wrap($el).find('h2 > span').should('have.text', 'Invite People');
-            cy.wrap($el).find('.help-text > span').should('have.text', 'Search and add members from other teams or email invite new users.');
+            cy.wrap($el).find('h2 > span').should('have.text', 'Add or Invite People');
+            cy.wrap($el).find('.help-text > span').should('have.text', 'Add existing members or send email invites to new members.');
         });
         cy.get('#inviteMembersButton').scrollIntoView().should('be.visible').and('be.disabled');
         cy.findByTestId('inputPlaceholder').should('be.visible').within(($el) => {
@@ -189,10 +190,12 @@ describe('Guest Account - Member Invitation Flow', () => {
 
     it('MM-18040 Verify Invite New/Existing Users', () => {
         // # Login as new user and get the user id
-        cy.createNewUser().then((newUser) => {
+        cy.apiCreateNewUser().then((newUser) => {
             cy.apiAddUserToTeam(testTeam.id, newUser.id);
+
+            // # Logout sysadmin, then login as new user
+            cy.apiLogout();
             cy.apiLogin(newUser.username, newUser.password);
-            cy.visit('/');
             cy.visit(`/${testTeam.name}`);
         });
 
@@ -210,6 +213,15 @@ describe('Guest Account - Member Invitation Flow', () => {
 
         // # Search and add a new member by email who is not part of the team
         const email = `temp-${getRandomInt(9999).toString()}@mattermost.com`;
+        invitePeople(email, 1, email);
+
+        // * Verify the content and message in next screen
+        verifyInvitationSuccess(email, 'An invitation email has been sent.');
+    });
+
+    it('MM-22037 Invite Member via Email containing upper case letters', () => {
+        // # Invite a email containing uppercase letters
+        const email = `tEMp-${getRandomInt(9999)}@mattermost.com`;
         invitePeople(email, 1, email);
 
         // * Verify the content and message in next screen

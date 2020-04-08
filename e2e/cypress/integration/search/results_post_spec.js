@@ -7,11 +7,14 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
+// Stage: @prod
+// Group: @search
+
 describe('Search', () => {
     before(() => {
         // # Login and navigate to the app
         cy.apiLogin('user-1');
-        cy.visit('/');
+        cy.visit('/ad-1/channels/town-square');
     });
 
     it('S19944 Highlighting does not change to what is being typed in the search input box', () => {
@@ -46,7 +49,7 @@ describe('Search', () => {
 
 function verifySearchResult(results, postId, fullMessage, highlightedTerm) {
     cy.queryAllByTestId('search-item-container').should('have.length', results).within(() => {
-        cy.get(`#postMessageText_${postId}`).should('have.text', `${fullMessage}`);
+        cy.get(`#rhsPostMessageText_${postId}`).should('have.text', `${fullMessage}`);
         cy.get('.search-highlight').should('be.visible').and('have.text', highlightedTerm);
     });
 }

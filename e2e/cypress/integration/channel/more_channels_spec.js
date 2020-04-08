@@ -7,47 +7,47 @@
 // - Use element ID when selecting an element. Create one if none.
 // ***************************************************************
 
-// import users from '../../fixtures/users.json';
+// Stage: @prod
+// Group: @channel
+
 import * as TIMEOUTS from '../../fixtures/timeouts';
-
-describe('Channels', () => {
-    it('MM-19337 Verify UI of More channels modal with archived selection', () => {
-        verifyMoreChannelsModalWithArchivedSelection(false);
-
-        verifyMoreChannelsModalWithArchivedSelection(true);
-    });
-});
 
 let channel;
 
 describe('Channels', () => {
-    before(() => {
+    it('MM-19337 Verify UI of More channels modal with archived selection', () => {
+        // # Login as sysadmin and update config
+        cy.apiLogin('sysadmin');
+        cy.apiGetTeamByName('ad-1').then((teamRes) => {
+            // # Create new test channel
+            cy.apiCreateChannel(teamRes.body.id, 'channel-test', 'Channel Test' + Date.now()).then((channelRes) => {
+                channel = channelRes.body;
+            });
+        });
+
+        cy.visit('/ad-1/channels/town-square');
+
+        verifyMoreChannelsModalWithArchivedSelection(false);
+
+        verifyMoreChannelsModalWithArchivedSelection(true);
+    });
+
+    it('MM-19337 Enable users to view archived channels', () => {
+        // # Login as new user and go to "/"
+        cy.apiLogin('sysadmin');
         cy.apiUpdateConfig({
             TeamSettings: {
                 ExperimentalViewArchivedChannels: true,
             },
         });
-
-        cy.apiLogin('user-1');
-        cy.visit('/');
-        cy.getCurrentTeamId().then((teamId) => {
-            // # Create new test channel
-            cy.apiCreateChannel(teamId, 'channel-test', 'Channel Test' + Date.now()).then((res) => {
-                channel = res.body;
-            });
+        cy.apiGetTeamByName('ad-1').then((res) => {
+            cy.apiCreateAndLoginAsNewUser({}, [res.body.id]);
+            cy.visit('/ad-1/channels/town-square');
         });
-    });
-
-    it('MM-19337 Enable users to view archived channels', () => {
-        // # Login as new use and go to "/"
-        cy.loginAsNewUser();
-        cy.visit('/');
 
         // # Go to LHS and click "More..." under Public Channels group
-        cy.get('#sidebarChannelContainer').should('be.visible').within(() => {
-            cy.get('#publicChannelList').should('be.visible').within(() => {
-                cy.findByText('More...').scrollIntoView().should('be.visible').click();
-            });
+        cy.get('#publicChannelList').should('be.visible').within(() => {
+            cy.findByText('More...').scrollIntoView().should('be.visible').click();
         });
 
         cy.get('#moreChannelsModal').should('be.visible').within(() => {
@@ -91,10 +91,8 @@ describe('Channels', () => {
         });
 
         // # Go to LHS and click "More..." under Public Channels group
-        cy.get('#sidebarChannelContainer').should('be.visible').within(() => {
-            cy.get('#publicChannelList').should('be.visible').within(() => {
-                cy.findByText('More...').scrollIntoView().should('be.visible').click();
-            });
+        cy.get('#publicChannelList').should('be.visible').within(() => {
+            cy.findByText('More...').scrollIntoView().should('be.visible').click();
         });
 
         cy.get('#moreChannelsModal').should('be.visible').within(() => {
@@ -128,20 +126,20 @@ describe('Channels', () => {
         cy.get('#sidebarItem_town-square').click();
 
         // * Assert that archived channel doesn't show up in LHS list
-        cy.get('#sidebarChannelContainer').should('be.visible').should('not.contain', channel.display_name);
+        cy.get('#publicChannelList').should('not.contain', channel.display_name);
     });
 });
 
 function verifyMoreChannelsModalWithArchivedSelection(isEnabled) {
-    // # Update config to enable/disable viewing of archived channels
+    // # Login as sysadmin and Update config to enable/disable viewing of archived channels
+    cy.apiLogin('sysadmin');
     cy.apiUpdateConfig({
         TeamSettings: {
             ExperimentalViewArchivedChannels: isEnabled,
         },
     });
 
-    // # Login as sysadmin and verify more channels modal
-    cy.apiLogin('sysadmin');
+    // * Verify more channels modal
     verifyMoreChannelsModal(isEnabled);
 
     // # Login as regular user and verify more channels modal
@@ -150,10 +148,12 @@ function verifyMoreChannelsModalWithArchivedSelection(isEnabled) {
 }
 
 function verifyMoreChannelsModal(isEnabled) {
-    cy.visit('/');
+    cy.visit('/ad-1/channels/town-square');
 
     // # Select "More..." on the left hand side menu
-    cy.get("button[data-testid='sidebarChannelsMore']").should('be.visible').click();
+    cy.get('#publicChannelList').should('be.visible').within(() => {
+        cy.findByText('More...').scrollIntoView().should('be.visible').click({force: true});
+    });
 
     // * Verify that the more channels modal is open and with or without option to view archived channels
     cy.get('#moreChannelsModal').should('be.visible').within(() => {

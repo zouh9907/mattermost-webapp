@@ -107,6 +107,14 @@ export function emitChannelClickEvent(channel) {
     }
 }
 
+export function updateNewMessagesAtInChannel(channelId, last_viewed_at = Date.now()) {
+    return {
+        type: ActionTypes.UPDATE_CHANNEL_LAST_VIEWED_AT,
+        channel_id: channelId,
+        last_viewed_at,
+    };
+}
+
 export function emitCloseRightHandSide() {
     dispatch(closeRightHandSide());
 }
@@ -131,14 +139,6 @@ export function showChannelNameUpdateModal(channel) {
         type: ActionTypes.TOGGLE_CHANNEL_NAME_UPDATE_MODAL,
         value: true,
         channel,
-    });
-}
-
-export function showGetPostLinkModal(post) {
-    AppDispatcher.handleViewAction({
-        type: ActionTypes.TOGGLE_GET_POST_LINK_MODAL,
-        value: true,
-        post,
     });
 }
 
