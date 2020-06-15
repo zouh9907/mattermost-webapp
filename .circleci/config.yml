@@ -152,7 +152,7 @@ jobs:
       - persist_to_workspace:
           root: ~/mattermost
           paths:
-            - mattermost-webapp
+            - mattermost-webapp/mattermost-webapp.tar.gz
 
   build-storybook:
     executor:
@@ -167,7 +167,7 @@ jobs:
       - persist_to_workspace:
           root: ~/mattermost
           paths:
-            - mattermost-webapp
+            - mattermost-webapp/storybook-static
 
   upload-storybook:
     docker:
