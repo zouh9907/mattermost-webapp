@@ -13,10 +13,18 @@ executors:
 aliases:
   - &restore_cache
     restore_cache:
-      key: dependencies-{{ checksum "package-lock.json" }}-2
+      key: dependencies-{{ checksum "package-lock.json" }}-1
   - &save_cache
     save_cache:
-      key: dependencies-{{ checksum "package-lock.json" }}-2
+      key: dependencies-{{ checksum "package-lock.json" }}-1
+      paths:
+        - ~/mattermost/mattermost-webapp/node_modules
+  - &restore_npm_cache
+    restore_cache:
+      key: npm-{{ checksum "package-lock.json" }}
+  - &save_npm_cache
+    save_cache:
+      key: npm-{{ checksum "package-lock.json" }}
       paths:
         - ~/.npm
 
@@ -27,15 +35,10 @@ jobs:
     working_directory: ~/mattermost/mattermost-webapp
     steps:
       - checkout
-      - *restore_cache
       - run: |
           npm ci
           cd node_modules/mattermost-redux && npm i && npm run build
       - *save_cache
-      - persist_to_workspace:
-          root: ~/mattermost
-          paths:
-            - mattermost-webapp
 
   check-deps:
     parameters:
@@ -48,13 +51,13 @@ jobs:
       version_url: "https://jeremylong.github.io/DependencyCheck/current.txt"
       executable_url: "https://dl.bintray.com/jeremy-long/owasp/dependency-check-VERSION-release.zip"
     steps:
+      - checkout
       - run:
           name: Link dependency cache
           command: |
             sudo mkdir /root/mattermost
             sudo ln -s ~/mattermost/mattermost-webapp /root/mattermost/mattermost-webapp; sudo chmod 777 /root
-      - attach_workspace:
-          at: ~/mattermost/
+      - *restore_cache
       - run:
           name: Adjust permissions
           command: sudo chown -R `id -nu`:`id -ng` node_modules
@@ -95,8 +98,8 @@ jobs:
       name: default
     working_directory: ~/mattermost/mattermost-webapp
     steps:
-      - attach_workspace:
-          at: ~/mattermost/
+      - checkout
+      - *restore_cache
       - run: |
           npm run check
 
@@ -105,8 +108,8 @@ jobs:
       name: default
     working_directory: ~/mattermost/mattermost-webapp
     steps:
-      - attach_workspace:
-          at: ~/mattermost/
+      - checkout
+      - *restore_cache
       - run: |
           cp i18n/en.json /tmp/en.json
           mkdir -p /tmp/fake-mobile-dir/assets/base/i18n/
@@ -119,8 +122,8 @@ jobs:
       name: default
     working_directory: ~/mattermost/mattermost-webapp
     steps:
-      - attach_workspace:
-          at: ~/mattermost/
+      - checkout
+      - *restore_cache
       - run: |
           npm run check-types
 
@@ -129,8 +132,8 @@ jobs:
       name: default
     working_directory: ~/mattermost/mattermost-webapp
     steps:
-      - attach_workspace:
-          at: ~/mattermost/
+      - checkout
+      - *restore_cache
       - run: npm run test-ci
       - store_test_results:
           path: build/
@@ -141,8 +144,8 @@ jobs:
     resource_class: xlarge
     working_directory: ~/mattermost/mattermost-webapp
     steps:
-      - attach_workspace:
-          at: ~/mattermost/
+      - checkout
+      - *restore_cache
       - run: |
           node --version
           npm version
@@ -159,8 +162,8 @@ jobs:
       name: default
     working_directory: ~/mattermost/mattermost-webapp
     steps:
-      - attach_workspace:
-          at: ~/mattermost/
+      - checkout
+      - *restore_cache
       - run: npm run build-storybook
       - store_artifacts:
           path: ~/mattermost/mattermost-webapp/storybook-static
