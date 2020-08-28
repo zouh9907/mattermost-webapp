@@ -19,7 +19,12 @@
     "noEmit": true,
     "experimentalDecorators": true,
     "jsx": "react",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "mattermost-redux/*": [
+        "packages/mattermost-redux/src/*"
+      ]
+    }
   },
   "include": [
     "./**/*"
