@@ -28,16 +28,16 @@ describe('Leave an archived channel', () => {
         // # Login as test user and visit town-square
         cy.apiInitSetup({loginAfter: true}).then(({team}) => {
             testTeam = team;
+
+            // # Visit the test team
+            cy.visit(`/${testTeam.name}`);
         });
     });
 
     it('MM-T1680 Open archived channel from search results with permalink view in another channel is open', () => {
-        // # Visit the test team
-        cy.visit(`/${testTeam.name}`);
-
         // # Create a new channel
-        const archivedChannel = `channel${getRandomId()}`;
-        cy.uiCreateChannel({displayName: archivedChannel});
+        const archivedChannelName = `channel${getRandomId()}`;
+        cy.uiCreateChannel({displayName: archivedChannelName});
 
         // # Make a post
         const archivedPostText = `archived${getRandomId()}`;
@@ -69,6 +69,10 @@ describe('Leave an archived channel', () => {
             // * Verify that the RHS has switched from search results to the thread
             cy.get('#searchContainer').should('not.exist');
             cy.get('#rhsContainer').should('be.visible');
+
+            // * Verify that the back button is displayed in the RHS and that the channel name is correct
+            cy.get('a.sidebar--right__back').should('be.visible');
+            cy.contains('.sidebar--right__title__channel', archivedChannelName);
 
             // * Verify that the thread is visible and marked as archived
             cy.get(`#rhsPost_${archivedPostId}`).should('be.visible');
