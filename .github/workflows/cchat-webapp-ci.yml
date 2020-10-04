@@ -154,7 +154,7 @@ jobs:
       - name: Install Dependency
         run: |
           npm ci
-          cd node_modules/mattermost-redux && npm ci && npm run build
+          cd node_modules/mattermost-redux && npm i && npm run build
       - name: Build
         run: npm run build 
       - name: Upload Webapp
