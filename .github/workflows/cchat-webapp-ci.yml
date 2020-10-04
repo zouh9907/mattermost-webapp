@@ -119,7 +119,7 @@ jobs:
       - name: Install Dependency
         run: npm ci
       - name: Test
-        run: npm run test 
+        run: npm run test-ci 
       - name: Upload Jest JUnit Report
         uses: actions/upload-artifact@v2
         with:
