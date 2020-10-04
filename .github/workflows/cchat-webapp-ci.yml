@@ -123,7 +123,7 @@ jobs:
       - name: Test
         run: npm run test-ci 
       - name: Generate HTML Report
-        run: xunit-viewer -r build/test-results.xml -o  test-results.html
+        run: xunit-viewer -r build/test-results.xml -o build/test-results.html
       - name: Upload Test Report
         uses: actions/upload-artifact@v2
         with:
