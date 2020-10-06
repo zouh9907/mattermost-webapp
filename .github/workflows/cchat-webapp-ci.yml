@@ -9,24 +9,28 @@ on:
 jobs:
   check-env:
     name: Check Environment
-    runs-on: cc-runner
+    runs-on: self-hosted
     steps:
       - name: Verify make Installment
         run: make -version
+      
       - name: Verify node Installment
         run: node -v
+      
       - name: Verify npm Installment
         run: npm -v
+      
       - name: Verify xunit-viewer Installment
         run: xunit-viewer --version
 
   check-style:
-    name: Check Style
-    runs-on: cc-runner
+    name: Check Webapp Style
+    runs-on: self-hosted
     needs: [ check-env ]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+      
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -39,18 +43,21 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+      
       - name: Install Dependency
         run: npm ci
+      
       - name: Check Style
         run: npm run check
 
   check-i18n:
-    name: Check I18n
-    runs-on: cc-runner
+    name: Check Webapp I18n
+    runs-on: self-hosted
     needs: [ check-env ]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+      
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -63,8 +70,10 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+      
       - name: Install Dependency
         run: npm ci
+      
       - name: Check I18n
         run: |
           cp i18n/en.json /tmp/en.json
@@ -76,12 +85,13 @@ jobs:
           rm -rf tmp
 
   check-type:
-    name: Check Type
-    runs-on: cc-runner
+    name: Check Webapp Type
+    runs-on: self-hosted
     needs: [ check-env ]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+      
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -94,18 +104,21 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+      
       - name: Install Dependency
         run: npm ci
+      
       - name: Check Type
         run: npm run check-types
 
-  test:
-    name: Unit Test
-    runs-on: cc-runner
-    needs: [ check-style , check-type , check-i18n]
+  test-webapp:
+    name: Test Webapp
+    runs-on: self-hosted
+    needs: [ check-style , check-type , check-i18n ]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+      
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -118,27 +131,39 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+      
       - name: Install Dependency
         run: npm ci
+      
       - name: Test
         run: npm run test-ci 
+      
+      - name: Check Xml Test Report
+        id: find_test_report
+        run: test -f build/test-results.xml
+        if: always()
+
       - name: Generate HTML Report
         run: xunit-viewer -r build/test-results.xml -o build/test-results.html
+        if: steps.find_test_report.outcome == 'success'
+      
       - name: Upload Test Report
         uses: actions/upload-artifact@v2
+        if: steps.find_test_report.outcome == 'success'
         with:
-          name: test-results
+          name: webapp-test-results-${{ github.run_id }}
           path: |
             build/test-results.xml
             build/test-results.html
 
   build:
-    name: Build
-    runs-on: cc-runner
-    needs: [ test ]
+    name: Build Webapp
+    runs-on: self-hosted
+    needs: [ test-webapp ]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+      
       - name: Cache node modules
         uses: actions/cache@v2
         env:
@@ -151,14 +176,17 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
+      
       - name: Install Dependency
         run: |
           npm ci
           cd node_modules/mattermost-redux && npm i && npm run build
+      
       - name: Build
         run: npm run build 
+
       - name: Upload Webapp
         uses: actions/upload-artifact@v2
         with:
-          name: casualchat-mattermost-webapp
+          name: casualchat-mattermost-webapp-${{ github.run_number }}
           path: dist/
