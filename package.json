@@ -71,6 +71,7 @@
     "superagent": "5.2.2",
     "tinycolor2": "1.4.1",
     "typescript": "3.9.5",
+    "wait-for-expect": "3.0.2",
     "xregexp": "4.3.0",
     "zen-observable": "0.8.15"
   },

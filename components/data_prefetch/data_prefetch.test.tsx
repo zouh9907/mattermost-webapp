@@ -6,6 +6,8 @@ import React from 'react';
 
 import {ChannelType} from 'mattermost-redux/types/channels';
 
+import waitForExpect from 'wait-for-expect';
+
 import {loadProfilesForSidebar} from 'actions/user_actions.jsx';
 
 import DataPrefetch from './data_prefetch';
@@ -109,18 +111,16 @@ describe('/components/create_team', () => {
         instance.prefetchPosts = jest.fn(() => Promise.resolve({}));
 
         wrapper.setProps({currentChannelId: 'currentChannelId'});
-        expect(instance.prefetchPosts).toHaveBeenCalledWith('currentChannelId');
         await props.actions.prefetchChannelPosts();
-
         await loadProfilesForSidebar();
+        await waitForExpect(() => {
+            expect(instance.prefetchPosts).toHaveBeenCalledTimes(5);
+        });
+        expect(instance.prefetchPosts).toHaveBeenCalledWith('currentChannelId');
         expect(instance.prefetchPosts).toHaveBeenCalledWith('mentionChannel0');
         expect(instance.prefetchPosts).toHaveBeenCalledWith('mentionChannel1');
-        expect(instance.prefetchPosts).toHaveBeenCalledTimes(3);
-
-        await props.actions.prefetchChannelPosts();
         expect(instance.prefetchPosts).toHaveBeenCalledWith('mentionChannel2');
         expect(instance.prefetchPosts).toHaveBeenCalledWith('mentionChannel3');
-        expect(instance.prefetchPosts).toHaveBeenCalledTimes(5);
     });
 
     test('Should call for new prefetchQueueObj channels on change of prop and cancel previous ones', async () => {
@@ -142,7 +142,9 @@ describe('/components/create_team', () => {
 
         await props.actions.prefetchChannelPosts();
         await loadProfilesForSidebar();
-        expect(instance.prefetchPosts).toHaveBeenCalledTimes(3);
+        await waitForExpect(() => {
+            expect(instance.prefetchPosts).toHaveBeenCalledTimes(6);
+        });
         wrapper.setProps({
             prefetchQueueObj: {
                 1: ['mentionChannel5', 'mentionChannel6'],
@@ -153,7 +155,9 @@ describe('/components/create_team', () => {
         });
 
         await props.actions.prefetchChannelPosts();
-        expect(instance.prefetchPosts).toHaveBeenCalledTimes(5);
+        await waitForExpect(() => {
+            expect(instance.prefetchPosts).toHaveBeenCalledTimes(8);
+        });
         expect(instance.prefetchPosts).toHaveBeenCalledWith('mentionChannel5');
         expect(instance.prefetchPosts).toHaveBeenCalledWith('mentionChannel6');
     });
@@ -177,7 +181,9 @@ describe('/components/create_team', () => {
 
         await props.actions.prefetchChannelPosts();
         await loadProfilesForSidebar();
-        expect(instance.prefetchPosts).toHaveBeenCalledTimes(3);
+        await waitForExpect(() => {
+            expect(instance.prefetchPosts).toHaveBeenCalledTimes(6);
+        });
         wrapper.setProps({
             prefetchQueueObj: {
                 1: ['mentionChannel5', 'mentionChannel6'],
@@ -187,7 +193,9 @@ describe('/components/create_team', () => {
         });
 
         await props.actions.prefetchChannelPosts();
-        expect(instance.prefetchPosts).toHaveBeenCalledTimes(5);
+        await waitForExpect(() => {
+            expect(instance.prefetchPosts).toHaveBeenCalledTimes(8);
+        });
         expect(instance.prefetchPosts).toHaveBeenCalledWith('mentionChannel5');
         expect(instance.prefetchPosts).toHaveBeenCalledWith('mentionChannel6');
     });

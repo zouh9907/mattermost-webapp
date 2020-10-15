@@ -10,7 +10,10 @@ tests/reports
 mattermost-webapp.iml
 .vscode/
 junit.xml
+test-results.html
 coverage
+
+*.log
 
 # Environment variables
 .env*
