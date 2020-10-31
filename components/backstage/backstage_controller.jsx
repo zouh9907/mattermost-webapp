@@ -13,6 +13,7 @@ import AnnouncementBar from 'components/announcement_bar';
 import SystemNotice from 'components/system_notice';
 import Integrations from 'components/integrations';
 import Emoji from 'components/emoji';
+import EmojiPrivate from 'casualchat/components/emoji-private';
 import AddEmoji from 'components/emoji/add_emoji';
 import InstalledIncomingWebhooks from 'components/integrations/installed_incoming_webhooks';
 import AddIncomingWehook from 'components/integrations/add_incoming_webhook';
@@ -182,12 +183,24 @@ export default class BackstageController extends React.PureComponent {
                         <BackstageRoute
                             extraProps={extraProps}
                             exact={true}
-                            path={'/:team/emoji'}
-                            component={Emoji}
+                            path={'/:team/emoji_private'}
+                            component={EmojiPrivate}
                         />
                         <BackstageRoute
                             extraProps={extraProps}
+                            exact={true}
+                            path={'/:team/emoji'}
+                            component={Emoji}
+                        />
+                        
+                        <BackstageRoute
+                            extraProps={{...extraProps, shouldUploadPrivate: false}}
                             path={`${this.props.match.url}/add`}
+                            component={AddEmoji}
+                        />
+                        <BackstageRoute
+                            extraProps={{...extraProps,shouldUploadPrivate: true}}
+                            path={`${this.props.match.url}/add_private`}
                             component={AddEmoji}
                         />
                         <BackstageRoute

@@ -5,6 +5,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
 import {createCustomEmoji} from 'mattermost-redux/actions/emojis';
+import {createPrivateEmoji} from 'casualchat/actions/emojis';
 
 import {getEmojiMap} from 'selectors/emojis';
 
@@ -20,6 +21,7 @@ function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({
             createCustomEmoji,
+            createPrivateEmoji,
         }, dispatch),
     };
 }
