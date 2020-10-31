@@ -16,10 +16,12 @@ export default class AddEmoji extends React.PureComponent {
     static propTypes = {
         actions: PropTypes.shape({
             createCustomEmoji: PropTypes.func.isRequired,
+            createPrivateEmoji: PropTypes.func.isRequired,
         }).isRequired,
         emojiMap: PropTypes.object.isRequired,
         team: PropTypes.object,
         user: PropTypes.object,
+        shouldUploadPrivate: PropTypes.bool.isRequired
     };
 
     static contextTypes = {
@@ -39,7 +41,7 @@ export default class AddEmoji extends React.PureComponent {
     }
 
     handleSubmit = async (e) => {
-        const {actions, emojiMap, user, team} = this.props;
+        const {actions, shouldUploadPrivate, emojiMap, user, team} = this.props;
         const {image, name, saving} = this.state;
 
         e.preventDefault();
@@ -114,8 +116,12 @@ export default class AddEmoji extends React.PureComponent {
 
             return;
         }
-
-        const {error} = await actions.createCustomEmoji(emoji, image);
+        let error;
+        if(shouldUploadPrivate){
+            error = await actions.createPrivateEmoji(emoji, image);   
+        }else{
+            error = await actions.createCustomEmoji(emoji, image);
+        }
         if (error) {
             this.setState({
                 saving: false,

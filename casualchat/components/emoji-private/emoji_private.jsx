@@ -11,7 +11,7 @@ import Permissions from 'mattermost-redux/constants/permissions';
 import * as Utils from 'utils/utils.jsx';
 import AnyTeamPermissionGate from 'components/permissions_gates/any_team_permission_gate';
 
-import EmojiList from './emoji_list';
+import EmojiList from 'components/emoji/emoji_list';
 
 export default class EmojiPage extends React.PureComponent {
     static propTypes = {
@@ -37,7 +37,7 @@ export default class EmojiPage extends React.PureComponent {
     }
 
     updateTitle = () => {
-        document.title = Utils.localizeMessage('custom_emoji.header', 'Custom Emoji') + ' - ' + this.props.teamDisplayName + ' ' + this.props.siteName;
+        document.title = Utils.localizeMessage('custom_emoji.header-private', 'Private Emoji') + ' - ' + this.props.teamDisplayName + ' ' + this.props.siteName;
     }
 
     componentDidUpdate(prevProps) {
@@ -53,27 +53,27 @@ export default class EmojiPage extends React.PureComponent {
                     <h1>
                         <FormattedMessage
                             id='emoji_list.header'
-                            defaultMessage='Custom Emoji'
+                            defaultMessage='Private Emoji'
                         />
                     </h1>
-                    <AnyTeamPermissionGate permissions={[Permissions.CREATE_EMOJIS]}>
+
                         <Link
                             className='add-link'
-                            to={'/' + this.props.teamName + '/emoji/add'}
+                            to={'/' + this.props.teamName + '/emoji/add_private'}
                         >
                             <button
                                 type='button'
                                 className='btn btn-primary'
                             >
                                 <FormattedMessage
-                                    id='emoji_list.add'
-                                    defaultMessage='Add Custom Emoji'
+                                    id='emoji_list.add-private'
+                                    defaultMessage='Add Private Emoji'
                                 />
                             </button>
                         </Link>
-                    </AnyTeamPermissionGate>
+
                 </div>
-                <EmojiList scrollToTop={this.props.scrollToTop} isPrivate={false}/>
+                <EmojiList scrollToTop={this.props.scrollToTop} isPrivate={true}/>
             </div>
         );
     }
