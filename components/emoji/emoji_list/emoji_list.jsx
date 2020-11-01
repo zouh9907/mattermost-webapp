@@ -287,75 +287,149 @@ export default class EmojiList extends React.PureComponent {
             }
         }
 
-        return (
-            <div>
-                <div className='backstage-filters'>
-                    <div className='backstage-filter__search'>
-                        <SearchIcon/>
-                        <LocalizedInput
-                            type='search'
-                            className='form-control'
-                            placeholder={{id: t('emoji_list.search'), defaultMessage: 'Search Custom Emoji'}}
-                            onChange={this.onSearchChange}
-                            style={style.search}
-                        />
+        if(this.props.isPrivate){
+            return (
+                <div>
+                    <div className='backstage-filters'>
+                        <div className='backstage-filter__search'>
+                            <SearchIcon/>
+                            <LocalizedInput
+                                type='search'
+                                className='form-control'
+                                placeholder={{id: t('emoji_list.search'), defaultMessage: 'Search Private Emoji'}}
+                                onChange={this.onSearchChange}
+                                style={style.search}
+                            />
+                        </div>
+                    </div>
+                    <span className='backstage-list__help'>
+                        <p>
+                            <FormattedMessage
+                                id='emoji_list.help'
+                                defaultMessage="Private emoji are only available to the ones that upload or save them. Type ':' followed by two characters in a message box to bring up the emoji selection menu."
+                            />
+                        </p>
+                        <p>
+                            <FormattedMessage
+                                id='emoji_list.help2'
+                                defaultMessage="Tip: If you add #, ##, or ### as the first character on a new line containing emoji, you can use larger sized emoji. To try it out, send a message such as: '# :smile:'."
+                            />
+                        </p>
+                    </span>
+                    <div className='backstage-list'>
+                        <table className='emoji-list__table'>
+                            <thead>
+                                <tr className='backstage-list__item emoji-list__table-header'>
+                                    <th className='emoji-list__name'>
+                                        <FormattedMessage
+                                            id='emoji_list.name'
+                                            defaultMessage='Name'
+                                        />
+                                    </th>
+                                    <th className='emoji-list__image'>
+                                        <FormattedMessage
+                                            id='emoji_list.image'
+                                            defaultMessage='Image'
+                                        />
+                                    </th>
+                                    <th className='emoji-list__creator'>
+                                        <FormattedMessage
+                                            id='emoji_list.creator'
+                                            defaultMessage='Creator'
+                                        />
+                                    </th>
+                                    <th className='emoji-list_actions'>
+                                        <FormattedMessage
+                                            id='emoji_list.actions'
+                                            defaultMessage='Actions'
+                                        />
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {emojis}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className='filter-controls pt-3'>
+                        {previousButton}
+                        {nextButton}
                     </div>
                 </div>
-                <span className='backstage-list__help'>
-                    <p>
-                        <FormattedMessage
-                            id='emoji_list.help'
-                            defaultMessage="Custom emoji are available to everyone on your server. Type ':' followed by two characters in a message box to bring up the emoji selection menu."
-                        />
-                    </p>
-                    <p>
-                        <FormattedMessage
-                            id='emoji_list.help2'
-                            defaultMessage="Tip: If you add #, ##, or ### as the first character on a new line containing emoji, you can use larger sized emoji. To try it out, send a message such as: '# :smile:'."
-                        />
-                    </p>
-                </span>
-                <div className='backstage-list'>
-                    <table className='emoji-list__table'>
-                        <thead>
-                            <tr className='backstage-list__item emoji-list__table-header'>
-                                <th className='emoji-list__name'>
-                                    <FormattedMessage
-                                        id='emoji_list.name'
-                                        defaultMessage='Name'
-                                    />
-                                </th>
-                                <th className='emoji-list__image'>
-                                    <FormattedMessage
-                                        id='emoji_list.image'
-                                        defaultMessage='Image'
-                                    />
-                                </th>
-                                <th className='emoji-list__creator'>
-                                    <FormattedMessage
-                                        id='emoji_list.creator'
-                                        defaultMessage='Creator'
-                                    />
-                                </th>
-                                <th className='emoji-list_actions'>
-                                    <FormattedMessage
-                                        id='emoji_list.actions'
-                                        defaultMessage='Actions'
-                                    />
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {emojis}
-                        </tbody>
-                    </table>
+            );
+        }else{
+            return (
+                <div>
+                    <div className='backstage-filters'>
+                        <div className='backstage-filter__search'>
+                            <SearchIcon/>
+                            <LocalizedInput
+                                type='search'
+                                className='form-control'
+                                placeholder={{id: t('emoji_list.search'), defaultMessage: 'Search Custom Emoji'}}
+                                onChange={this.onSearchChange}
+                                style={style.search}
+                            />
+                        </div>
+                    </div>
+                    <span className='backstage-list__help'>
+                        <p>
+                            <FormattedMessage
+                                id='emoji_list.help'
+                                defaultMessage="Custom emoji are available to everyone on your server. Type ':' followed by two characters in a message box to bring up the emoji selection menu."
+                            />
+                        </p>
+                        <p>
+                            <FormattedMessage
+                                id='emoji_list.help2'
+                                defaultMessage="Tip: If you add #, ##, or ### as the first character on a new line containing emoji, you can use larger sized emoji. To try it out, send a message such as: '# :smile:'."
+                            />
+                        </p>
+                    </span>
+                    <div className='backstage-list'>
+                        <table className='emoji-list__table'>
+                            <thead>
+                                <tr className='backstage-list__item emoji-list__table-header'>
+                                    <th className='emoji-list__name'>
+                                        <FormattedMessage
+                                            id='emoji_list.name'
+                                            defaultMessage='Name'
+                                        />
+                                    </th>
+                                    <th className='emoji-list__image'>
+                                        <FormattedMessage
+                                            id='emoji_list.image'
+                                            defaultMessage='Image'
+                                        />
+                                    </th>
+                                    <th className='emoji-list__creator'>
+                                        <FormattedMessage
+                                            id='emoji_list.creator'
+                                            defaultMessage='Creator'
+                                        />
+                                    </th>
+                                    <th className='emoji-list_actions'>
+                                        <FormattedMessage
+                                            id='emoji_list.actions'
+                                            defaultMessage='Actions'
+                                        />
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {emojis}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className='filter-controls pt-3'>
+                        {previousButton}
+                        {nextButton}
+                    </div>
                 </div>
-                <div className='filter-controls pt-3'>
-                    {previousButton}
-                    {nextButton}
-                </div>
-            </div>
-        );
+            );
+        }
+
+        
     }
 }
 
