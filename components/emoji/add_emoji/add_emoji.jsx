@@ -11,6 +11,7 @@ import FormError from 'components/form_error';
 import SpinnerButton from 'components/spinner_button';
 import {browserHistory} from 'utils/browser_history';
 import {localizeMessage} from 'utils/utils.jsx';
+import {If,Else,Then} from 'react-if';
 
 export default class AddEmoji extends React.PureComponent {
     static propTypes = {
@@ -204,18 +205,39 @@ export default class AddEmoji extends React.PureComponent {
 
         return (
             <div className='backstage-content row'>
-                <BackstageHeader>
-                    <Link to={'/' + this.props.team.name + '/emoji'}>
-                        <FormattedMessage
-                            id='emoji_list.header'
-                            defaultMessage='Custom Emoji'
-                        />
-                    </Link>
-                    <FormattedMessage
-                        id='add_emoji.header'
-                        defaultMessage='Add'
-                    />
-                </BackstageHeader>
+            
+                <If condition={this.props.shouldUploadPrivate}>
+                    <Then>
+                        <BackstageHeader>
+                            <Link to={'/' + this.props.team.name + '/emoji_private'}>
+                                <FormattedMessage
+                                    id='emoji_list.header-private'
+                                    defaultMessage='Private Emoji'
+                                />
+                            </Link>
+                            <FormattedMessage
+                                id='add_emoji.header'
+                                defaultMessage='Add'
+                            />
+                        </BackstageHeader>
+                    </Then>
+                    <Else>
+                        <BackstageHeader>
+                            <Link to={'/' + this.props.team.name + '/emoji'}>
+                                <FormattedMessage
+                                    id='emoji_list.header'
+                                    defaultMessage='Public Emoji'
+                                />
+                            </Link>
+                            <FormattedMessage
+                                id='add_emoji.header'
+                                defaultMessage='Add'
+                            />
+                        </BackstageHeader>
+                    </Else>
+                </If>
+                    
+                
                 <div className='backstage-form'>
                     <form
                         className='form-horizontal'
@@ -293,7 +315,7 @@ export default class AddEmoji extends React.PureComponent {
                             />
                             <Link
                                 className='btn btn-link btn-sm'
-                                to={'/' + this.props.team.name + '/emoji'}
+                                to={this.props.shouldUploadPrivate ? ('/' + this.props.team.name + '/emoji_private') : ('/' + this.props.team.name + '/emoji')}
                             >
                                 <FormattedMessage
                                     id='add_emoji.cancel'

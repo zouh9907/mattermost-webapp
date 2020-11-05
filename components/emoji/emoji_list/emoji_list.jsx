@@ -217,7 +217,7 @@ export default class EmojiList extends React.PureComponent {
                         <td colSpan='4'>
                             <FormattedMessage
                                 id='emoji_list.empty'
-                                defaultMessage='No custom emoji found'
+                                defaultMessage='No public emoji found'
                             />
                         </td>
                     </tr>,
@@ -296,7 +296,7 @@ export default class EmojiList extends React.PureComponent {
                             <LocalizedInput
                                 type='search'
                                 className='form-control'
-                                placeholder={{id: t('emoji_list.search'), defaultMessage: 'Search Private Emoji'}}
+                                placeholder={{id: t('emoji_list.search-private'), defaultMessage: 'Search Private Emoji'}}
                                 onChange={this.onSearchChange}
                                 style={style.search}
                             />
@@ -366,7 +366,7 @@ export default class EmojiList extends React.PureComponent {
                             <LocalizedInput
                                 type='search'
                                 className='form-control'
-                                placeholder={{id: t('emoji_list.search'), defaultMessage: 'Search Custom Emoji'}}
+                                placeholder={{id: t('emoji_list.search'), defaultMessage: 'Search Public Emoji'}}
                                 onChange={this.onSearchChange}
                                 style={style.search}
                             />
@@ -376,7 +376,7 @@ export default class EmojiList extends React.PureComponent {
                         <p>
                             <FormattedMessage
                                 id='emoji_list.help'
-                                defaultMessage="Custom emoji are available to everyone on your server. Type ':' followed by two characters in a message box to bring up the emoji selection menu."
+                                defaultMessage="Public emoji are available to everyone on your server. Type ':' followed by two characters in a message box to bring up the emoji selection menu."
                             />
                         </p>
                         <p>

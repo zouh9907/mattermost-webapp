@@ -41,7 +41,25 @@ export default class BackstageSidebar extends React.PureComponent {
                 title={
                     <FormattedMessage
                         id='backstage_sidebar.emoji'
-                        defaultMessage='Custom Emoji'
+                        defaultMessage='Public Emoji'
+                    />
+                }
+            />
+        );
+    }
+
+    renderPrivateEmoji() {
+        
+
+        return (
+            <BackstageCategory
+                name='emoji_private'
+                parentLink={'/' + this.props.team.name}
+                icon='fa-smile-o'
+                title={
+                    <FormattedMessage
+                        id='backstage_sidebar.emoji-private'
+                        defaultMessage='Private Emoji'
                     />
                 }
             />
@@ -181,8 +199,11 @@ export default class BackstageSidebar extends React.PureComponent {
         return (
             <div className='backstage-sidebar'>
                 <ul>
+                
                     {this.renderCustomEmoji()}
+                    {this.renderPrivateEmoji()}
                     {this.renderIntegrations()}
+                    
                 </ul>
             </div>
         );

@@ -52,14 +52,14 @@ export default class EmojiPage extends React.PureComponent {
                 <div className='backstage-header'>
                     <h1>
                         <FormattedMessage
-                            id='emoji_list.header'
+                            id='emoji_list.header-private'
                             defaultMessage='Private Emoji'
                         />
                     </h1>
 
                         <Link
                             className='add-link'
-                            to={'/' + this.props.teamName + '/emoji/add_private'}
+                            to={'/' + this.props.teamName + '/emoji_private/add_private'}
                         >
                             <button
                                 type='button'
