@@ -13,6 +13,8 @@ import {browserHistory} from 'utils/browser_history';
 import {localizeMessage} from 'utils/utils.jsx';
 import {If,Else,Then} from 'react-if';
 
+
+
 export default class AddEmoji extends React.PureComponent {
     static propTypes = {
         actions: PropTypes.shape({
@@ -117,21 +119,50 @@ export default class AddEmoji extends React.PureComponent {
 
             return;
         }
-        let error;
+        let response;
         if(shouldUploadPrivate){
-            error = await actions.createPrivateEmoji(emoji, image);   
+            response = await actions.createPrivateEmoji(emoji, image);   
         }else{
-            error = await actions.createCustomEmoji(emoji, image);
+            response = await actions.createCustomEmoji(emoji, image);
         }
-        if (error) {
-            this.setState({
-                saving: false,
-                error: error.message,
-            });
-            return;
+        console.log(response);
+
+        if ('data' in response) {
+            const savedEmoji = response;
+            if (savedEmoji && savedEmoji.data.name === emoji.name) {
+                if(shouldUploadPrivate){
+                    browserHistory.push('/' + team.name + '/emoji_private');
+                }else{
+                    browserHistory.push('/' + team.name + '/emoji');
+                }
+                return;
+            }
         }
 
-        browserHistory.push('/' + team.name + '/emoji');
+        if ('error' in response) {
+            const responseError = response;
+            if (responseError) {
+                this.setState({
+                    saving: false,
+                    error: responseError.error.message,
+                });
+
+                return;
+            }
+        }
+
+        const genericError = (
+            <FormattedMessage
+                id='add_emoji.failedToAdd'
+                defaultMessage='Something when wrong when adding the custom emoji.'
+            />
+        );
+
+        this.setState({
+            saving: false,
+            error: (genericError),
+        });
+        
     };
 
     updateName = (e) => {

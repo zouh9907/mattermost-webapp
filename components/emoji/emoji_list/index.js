@@ -13,7 +13,7 @@ import EmojiList from './emoji_list.jsx';
 
 function mapStateToProps(state) {
     return {
-        emojiIds: getCustomEmojiIdsSortedByName(state) || [],
+        //emojiIds: getCustomEmojiIdsSortedByName(state) || [],
         userId: getCurrentUserId(state),
     };
 }

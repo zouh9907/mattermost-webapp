@@ -26,7 +26,7 @@ export default class EmojiList extends React.PureComponent {
         /**
          * Custom emojis on the system.
          */
-        emojiIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+        //emojiIds: PropTypes.arrayOf(PropTypes.string).isRequired,
         userId: PropTypes.string.isRequired,
         /**
          * Function to scroll list to top.
@@ -68,6 +68,7 @@ export default class EmojiList extends React.PureComponent {
             nextLoading: false,
             searchEmojis: null,
             missingPages: true,
+            emojiIds: [],
         };
     }
 
@@ -76,14 +77,20 @@ export default class EmojiList extends React.PureComponent {
             this.props.actions.getPrivateEmojis(0, EMOJI_PER_PAGE + 1, Emoji.SORT_BY_NAME, true,this.props.userId).then(({data}) => {
                 this.setState({loading: false});
                 if (data && data.length < EMOJI_PER_PAGE) {
-                    this.setState({missingPages: false});
+                    this.setState({
+                        missingPages: false, 
+                        emojiIds:data.map(({id})=>id)
+                    });
                 }
             }); 
         }else{
             this.props.actions.getCustomEmojis(0, EMOJI_PER_PAGE + 1, Emoji.SORT_BY_NAME, true).then(({data}) => {
                 this.setState({loading: false});
                 if (data && data.length < EMOJI_PER_PAGE) {
-                    this.setState({missingPages: false});
+                    this.setState({
+                        missingPages: false, 
+                        emojiIds:data.map(({id})=>id)
+                    });
                 }
             });
         }
@@ -101,7 +108,10 @@ export default class EmojiList extends React.PureComponent {
             this.props.actions.getPrivateEmojis(next, EMOJI_PER_PAGE, Emoji.SORT_BY_NAME, true,this.props.userId).then(({data}) => {
                 this.setState({page: next, nextLoading: false});
                 if (data && data.length < EMOJI_PER_PAGE) {
-                    this.setState({missingPages: false});
+                    this.setState({
+                        missingPages: false, 
+                        emojiIds:data.map(({id})=>id)
+                    });
                 }
     
                 this.props.scrollToTop();
@@ -110,7 +120,10 @@ export default class EmojiList extends React.PureComponent {
             this.props.actions.getCustomEmojis(next, EMOJI_PER_PAGE, Emoji.SORT_BY_NAME, true).then(({data}) => {
                 this.setState({page: next, nextLoading: false});
                 if (data && data.length < EMOJI_PER_PAGE) {
-                    this.setState({missingPages: false});
+                    this.setState({
+                        missingPages: false, 
+                        emojiIds:data.map(({id})=>id)
+                    });
                 }
     
                 this.props.scrollToTop();
@@ -144,14 +157,14 @@ export default class EmojiList extends React.PureComponent {
 
             this.setState({loading: true});
 
-
+            let response;
             if(this.props.isPrivate){
-                const {data} = await this.props.actions.searchPrivateEmojis(term, {}, true, this.props.userId);
+                response = await this.props.actions.searchPrivateEmojis(term, {}, true, this.props.userId);
             }else{
-                const {data} = await this.props.actions.searchCustomEmojis(term, {}, true);
+                response = await this.props.actions.searchCustomEmojis(term, {}, true);
             }
             
-
+            const {data} = response;
             if (data) {
                 this.setState({searchEmojis: data.map((em) => em.id), loading: false});
             } else {
@@ -193,7 +206,7 @@ export default class EmojiList extends React.PureComponent {
                     </td>
                 </tr>,
             );
-        } else if (this.props.emojiIds.length === 0 || (searchEmojis && searchEmojis.length === 0)) {
+        } else if (this.state.emojiIds.length === 0 || (searchEmojis && searchEmojis.length === 0)) {
             if(this.props.isPrivate){
                 emojis.push(
                     <tr
@@ -236,7 +249,7 @@ export default class EmojiList extends React.PureComponent {
         } else {
             const pageStart = this.state.page * EMOJI_PER_PAGE;
             const pageEnd = pageStart + EMOJI_PER_PAGE;
-            const emojisToDisplay = this.props.emojiIds.slice(pageStart, pageEnd);
+            const emojisToDisplay = this.state.emojiIds.slice(pageStart, pageEnd);
 
             emojisToDisplay.forEach((emojiId) => {
                 emojis.push(

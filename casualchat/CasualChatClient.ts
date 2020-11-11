@@ -2,8 +2,17 @@ import {Emoji, SystemEmoji, CustomEmoji} from 'mattermost-redux/types/emojis';
 import {Client4} from 'mattermost-redux/client';
 import FormData from 'form-data';
 import {buildQueryString} from 'mattermost-redux/utils/helpers';
+import {isCustomEmoji} from 'mattermost-redux/utils/emoji_utils';
 
 const PER_PAGE_DEFAULT = 60;
+
+function getPrivateEmojisRoute(){
+    return `${Client4.getEmojisRoute()}/private`;
+}
+
+function getPrivateEmojiRoute(id:string){
+    return `${Client4.getEmojiRoute(id)}`;
+}
 
 export async function createPrivateEmoji(emoji: CustomEmoji, imageData: File): Promise<any> {
     Client4.trackEvent('api', 'api_emoji_custom_add_private');
@@ -22,39 +31,35 @@ export async function createPrivateEmoji(emoji: CustomEmoji, imageData: File): P
             'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
         };
     }
-    // console.log(userID);
     console.log(emoji);
     console.log(imageData);
-    // return Client4.doFetch<CustomEmoji>(
-    //     `????`,
-    //     request,
-    // );
-    return Promise.resolve("");
+    return Client4.doFetch<CustomEmoji>(
+        getPrivateEmojisRoute(),
+        request,
+    );
 };
 
-export async function getEmojiUrlByUser(userID: string, emoji: Emoji): Promise<string>{
-    console.log(userID);
-    console.log(emoji);
-    return Promise.resolve("");
-}
+export function getEmojiUrlByUser(userid: string, emoji: Emoji): string{
+    if (isCustomEmoji(emoji)) {
+        const url = `${getPrivateEmojiRoute(emoji.id)}/privateimage${buildQueryString({userid})}`;
+        return url;
+    }
 
-export async function getAllEmojisByUser(userID:string): Promise<Emoji[]>{
-    const allEmojis:Emoji[] = [];
-    console.log(userID);
-    return Promise.resolve(allEmojis);
+    const filename = emoji.filename || emoji.aliases[0];
+    return Client4.getSystemEmojiImageUrl(filename);
 }
 
 export async function getPrivateEmojis(userID: string, page: Number, perPage: Number, sort: string): Promise<Emoji[]> {
-    // return Client4.doFetch<CustomEmoji[]>(
-    //     `${Client4.getEmojisRoute()}${buildQueryString({page, per_page: perPage, sort})}`,
-    //     {method: 'get'},
-    // );
-    console.log("userId =", userID);
-    console.log("page =", page);
-    console.log("perPage =", perPage);
-    console.log("sort =", sort);
+    return Client4.doFetch<Emoji[]>(
+        `${getPrivateEmojisRoute()}${buildQueryString({page, per_page: perPage, sort})}`,
+        {method: 'get'},
+    );
+    // console.log("userId =", userID);
+    // console.log("page =", page);
+    // console.log("perPage =", perPage);
+    // console.log("sort =", sort);
 
-    return Promise.resolve([]);
+    //return Promise.resolve([]);
 };
 
 export async function searchPrivateEmoji (userID: string, term: string, options = {}): Promise<Emoji[]> {
@@ -70,4 +75,4 @@ export async function searchPrivateEmoji (userID: string, term: string, options 
 
 
 
-export default {createPrivateEmoji, getEmojiUrlByUser, getAllEmojisByUser, getPrivateEmojis, searchPrivateEmoji};
+export default {createPrivateEmoji, getEmojiUrlByUser,getPrivateEmojis, searchPrivateEmoji};
