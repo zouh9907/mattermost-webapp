@@ -22,7 +22,9 @@ describe('components/emoji/components/AddEmoji', () => {
         },
         actions: {
             createCustomEmoji: jest.fn().mockReturnValue({}),
+            createPrivateEmoji: jest.fn().mockReturnValue({}),
         },
+        shouldUploadPrivate: false
     };
 
     test('should match snapshot', () => {
@@ -118,5 +120,43 @@ describe('components/emoji/components/AddEmoji', () => {
         form.simulate('submit', {preventDefault: jest.fn()});
         expect(wrapper.state('saving')).toEqual(true);
         expect(baseProps.actions.createCustomEmoji).toBeCalled();
+    });
+
+    test('should submit the new added private emoji', () => {
+        const wrapper = shallow(
+            <AddEmoji {...{...baseProps, shouldUploadPrivate: true}}/>,
+            {context},
+        );
+
+        const file = new Blob([image], {type: 'image/png'});
+        const onload = jest.fn(() => {
+            wrapper.setState({image: file, imageUrl: image});
+        });
+        const readAsDataURL = jest.fn(() => onload());
+        const form = wrapper.find('form').first();
+        const nameInput = wrapper.find('#name');
+        const fileInput = wrapper.find('#select-emoji');
+
+        window.FileReader = jest.fn(() => ({
+            onload,
+            readAsDataURL,
+            result: image,
+        }));
+
+        // Submit the form without emoji name or file
+        form.simulate('submit', {preventDefault: jest.fn()});
+        expect(wrapper.state('saving')).toEqual(false);
+        expect(wrapper.state('error')).not.toBeNull();
+
+        // Submit the form without emoji  file
+        nameInput.simulate('change', {target: {name: 'name', value: 'emojiName'}});
+        form.simulate('submit', {preventDefault: jest.fn()});
+        expect(wrapper.state('saving')).toEqual(false);
+        expect(wrapper.state('error')).not.toBeNull();
+
+        fileInput.simulate('change', {target: {files: [file]}});
+        form.simulate('submit', {preventDefault: jest.fn()});
+        expect(wrapper.state('saving')).toEqual(true);
+        expect(baseProps.actions.createPrivateEmoji).toBeCalled();
     });
 });
