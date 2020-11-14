@@ -72,6 +72,7 @@
   "add_command.username": "回复用户名",
   "add_command.username.help": "（可选）指定发布此斜杠命令响应时使用的名称。 用户名最多可以 22 个字符并且包含小写字母、数字以及符号“-“，“ _”和“.”。 如果留空，则使用您的 Mattermost 用户名。",
   "add_emoji.cancel": "取消",
+  "add_emoji.failedToAdd": "添加表情时发生未知错误",
   "add_emoji.header": "添加",
   "add_emoji.image": "图像",
   "add_emoji.image.button": "选择",

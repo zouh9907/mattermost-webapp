@@ -96,6 +96,7 @@
   "add_command.username.help": "(Optional) Specify the name to use when posting responses for this slash command. Usernames can be up to 22 characters, and contain lowercase letters, numbers, and the symbols \"-\", \"_\", and \".\". If left blank, your Mattermost username is used.",
   "add_command.username.placeholder": "Username",
   "add_emoji.cancel": "Cancel",
+  "add_emoji.failedToAdd": "Something when wrong when adding the custom emoji.",
   "add_emoji.header": "Add",
   "add_emoji.image": "Image",
   "add_emoji.image.button": "Select",
