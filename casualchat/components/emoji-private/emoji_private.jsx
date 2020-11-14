@@ -6,12 +6,9 @@ import PropTypes from 'prop-types';
 import {FormattedMessage} from 'react-intl';
 import {Link} from 'react-router-dom';
 
-import Permissions from 'mattermost-redux/constants/permissions';
-
 import * as Utils from 'utils/utils.jsx';
-import AnyTeamPermissionGate from 'components/permissions_gates/any_team_permission_gate';
 
-import EmojiList from './emoji_list';
+import EmojiList from 'components/emoji/emoji_list';
 
 export default class EmojiPage extends React.PureComponent {
     static propTypes = {
@@ -37,7 +34,7 @@ export default class EmojiPage extends React.PureComponent {
     }
 
     updateTitle = () => {
-        document.title = Utils.localizeMessage('custom_emoji.header', 'Custom Emoji') + ' - ' + this.props.teamDisplayName + ' ' + this.props.siteName;
+        document.title = Utils.localizeMessage('custom_emoji.header-private', 'Private Emoji') + ' - ' + this.props.teamDisplayName + ' ' + this.props.siteName;
     }
 
     componentDidUpdate(prevProps) {
@@ -52,30 +49,30 @@ export default class EmojiPage extends React.PureComponent {
                 <div className='backstage-header'>
                     <h1>
                         <FormattedMessage
-                            id='emoji_list.header'
-                            defaultMessage='Custom Emoji'
+                            id='emoji_list.header-private'
+                            defaultMessage='Private Emoji'
                         />
                     </h1>
-                    <AnyTeamPermissionGate permissions={[Permissions.CREATE_EMOJIS]}>
-                        <Link
-                            className='add-link'
-                            to={'/' + this.props.teamName + '/emoji/add'}
+
+                    <Link
+                        className='add-link'
+                        to={'/' + this.props.teamName + '/emoji_private/add_private'}
+                    >
+                        <button
+                            type='button'
+                            className='btn btn-primary'
                         >
-                            <button
-                                type='button'
-                                className='btn btn-primary'
-                            >
-                                <FormattedMessage
-                                    id='emoji_list.add'
-                                    defaultMessage='Add Custom Emoji'
-                                />
-                            </button>
-                        </Link>
-                    </AnyTeamPermissionGate>
+                            <FormattedMessage
+                                id='emoji_list.add-private'
+                                defaultMessage='Add Private Emoji'
+                            />
+                        </button>
+                    </Link>
+
                 </div>
                 <EmojiList
                     scrollToTop={this.props.scrollToTop}
-                    isPrivate={false}
+                    isPrivate={true}
                 />
             </div>
         );

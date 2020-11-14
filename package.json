@@ -52,6 +52,7 @@
     "react-day-picker": "7.4.8",
     "react-dom": "16.13.1",
     "react-hot-loader": "4.12.21",
+    "react-if": "4.0.1",
     "react-inlinesvg": "1.2.0",
     "react-intl": "3.9.1",
     "react-is": "16.13.1",

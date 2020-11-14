@@ -46,6 +46,18 @@ describe('components/backstage/components/BackstageSidebar', () => {
         });
     });
 
+    // describe('private emoji', () => {
+
+    //     it(`should render private emoji category`, () => {
+    //         const wrapper = shallow(
+    //             <BackstageSidebar {...defaultProps}/>,
+    //         );
+
+    //         expect(wrapper.find(BackstageCategory).find({name: 'emoji_private'}).exists()).toBe(expected);
+    //     });
+
+    // });
+
     describe('incoming webhooks', () => {
         const testCases = [
             [{canManageIntegrations: false, enableIncomingWebhooks: false}, false],

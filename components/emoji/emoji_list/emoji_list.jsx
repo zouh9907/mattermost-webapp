@@ -26,7 +26,8 @@ export default class EmojiList extends React.PureComponent {
         /**
          * Custom emojis on the system.
          */
-        emojiIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+        //emojiIds: PropTypes.arrayOf(PropTypes.string).isRequired,
+        userId: PropTypes.string.isRequired,
 
         /**
          * Function to scroll list to top.
@@ -44,7 +45,18 @@ export default class EmojiList extends React.PureComponent {
              * Search custom emojis.
              */
             searchCustomEmojis: PropTypes.func.isRequired,
+
+            /**
+             * Get pages of private emojis.
+             */
+            getPrivateEmojis: PropTypes.func.isRequired,
+
+            /**
+             * Search private emojis.
+             */
+            searchPrivateEmojis: PropTypes.func.isRequired,
         }).isRequired,
+        isPrivate: PropTypes.bool.isRequired,
     }
 
     constructor(props) {
@@ -58,16 +70,32 @@ export default class EmojiList extends React.PureComponent {
             nextLoading: false,
             searchEmojis: null,
             missingPages: true,
+            emojiIds: [],
         };
     }
 
     componentDidMount() {
-        this.props.actions.getCustomEmojis(0, EMOJI_PER_PAGE + 1, Emoji.SORT_BY_NAME, true).then(({data}) => {
-            this.setState({loading: false});
-            if (data && data.length < EMOJI_PER_PAGE) {
-                this.setState({missingPages: false});
-            }
-        });
+        if (this.props.isPrivate) {
+            this.props.actions.getPrivateEmojis(0, EMOJI_PER_PAGE + 1, Emoji.SORT_BY_NAME, this.props.userId).then(({data}) => {
+                this.setState({loading: false});
+                if (data && data.length < EMOJI_PER_PAGE) {
+                    this.setState({
+                        missingPages: false,
+                        emojiIds: data.map(({id}) => id),
+                    });
+                }
+            });
+        } else {
+            this.props.actions.getCustomEmojis(0, EMOJI_PER_PAGE + 1, Emoji.SORT_BY_NAME, true).then(({data}) => {
+                this.setState({loading: false});
+                if (data && data.length < EMOJI_PER_PAGE) {
+                    this.setState({
+                        missingPages: false,
+                        emojiIds: data.map(({id}) => id),
+                    });
+                }
+            });
+        }
     }
 
     nextPage = (e) => {
@@ -77,14 +105,31 @@ export default class EmojiList extends React.PureComponent {
 
         const next = this.state.page + 1;
         this.setState({nextLoading: true});
-        this.props.actions.getCustomEmojis(next, EMOJI_PER_PAGE, Emoji.SORT_BY_NAME, true).then(({data}) => {
-            this.setState({page: next, nextLoading: false});
-            if (data && data.length < EMOJI_PER_PAGE) {
-                this.setState({missingPages: false});
-            }
+        if (this.props.isPrivate) {
+            this.props.actions.getPrivateEmojis(next, EMOJI_PER_PAGE, Emoji.SORT_BY_NAME, this.props.userId).then(({data}) => {
+                this.setState({page: next, nextLoading: false});
+                if (data && data.length < EMOJI_PER_PAGE) {
+                    this.setState({
+                        missingPages: false,
+                        emojiIds: data.map(({id}) => id),
+                    });
+                }
 
-            this.props.scrollToTop();
-        });
+                this.props.scrollToTop();
+            });
+        } else {
+            this.props.actions.getCustomEmojis(next, EMOJI_PER_PAGE, Emoji.SORT_BY_NAME, true).then(({data}) => {
+                this.setState({page: next, nextLoading: false});
+                if (data && data.length < EMOJI_PER_PAGE) {
+                    this.setState({
+                        missingPages: false,
+                        emojiIds: data.map(({id}) => id),
+                    });
+                }
+
+                this.props.scrollToTop();
+            });
+        }
     }
 
     previousPage = (e) => {
@@ -113,8 +158,14 @@ export default class EmojiList extends React.PureComponent {
 
             this.setState({loading: true});
 
-            const {data} = await this.props.actions.searchCustomEmojis(term, {}, true);
+            let response;
+            if (this.props.isPrivate) {
+                response = await this.props.actions.searchPrivateEmojis(term, {}, this.props.userId);
+            } else {
+                response = await this.props.actions.searchCustomEmojis(term, {}, true);
+            }
 
+            const {data} = response;
             if (data) {
                 this.setState({searchEmojis: data.map((em) => em.id), loading: false});
             } else {
@@ -156,20 +207,36 @@ export default class EmojiList extends React.PureComponent {
                     </td>
                 </tr>,
             );
-        } else if (this.props.emojiIds.length === 0 || (searchEmojis && searchEmojis.length === 0)) {
-            emojis.push(
-                <tr
-                    key='empty'
-                    className='backstage-list__item backstage-list__empty'
-                >
-                    <td colSpan='4'>
-                        <FormattedMessage
-                            id='emoji_list.empty'
-                            defaultMessage='No custom emoji found'
-                        />
-                    </td>
-                </tr>,
-            );
+        } else if (this.state.emojiIds.length === 0 || (searchEmojis && searchEmojis.length === 0)) {
+            if (this.props.isPrivate) {
+                emojis.push(
+                    <tr
+                        key='empty'
+                        className='backstage-list__item backstage-list__empty'
+                    >
+                        <td colSpan='4'>
+                            <FormattedMessage
+                                id='emoji_list.empty_private'
+                                defaultMessage='No private emoji found'
+                            />
+                        </td>
+                    </tr>,
+                );
+            } else {
+                emojis.push(
+                    <tr
+                        key='empty'
+                        className='backstage-list__item backstage-list__empty'
+                    >
+                        <td colSpan='4'>
+                            <FormattedMessage
+                                id='emoji_list.empty'
+                                defaultMessage='No public emoji found'
+                            />
+                        </td>
+                    </tr>,
+                );
+            }
         } else if (searchEmojis) {
             searchEmojis.forEach((emojiId) => {
                 emojis.push(
@@ -183,7 +250,7 @@ export default class EmojiList extends React.PureComponent {
         } else {
             const pageStart = this.state.page * EMOJI_PER_PAGE;
             const pageEnd = pageStart + EMOJI_PER_PAGE;
-            const emojisToDisplay = this.props.emojiIds.slice(pageStart, pageEnd);
+            const emojisToDisplay = this.state.emojiIds.slice(pageStart, pageEnd);
 
             emojisToDisplay.forEach((emojiId) => {
                 emojis.push(
@@ -234,6 +301,77 @@ export default class EmojiList extends React.PureComponent {
             }
         }
 
+        if (this.props.isPrivate) {
+            return (
+                <div>
+                    <div className='backstage-filters'>
+                        <div className='backstage-filter__search'>
+                            <SearchIcon/>
+                            <LocalizedInput
+                                type='search'
+                                className='form-control'
+                                placeholder={{id: t('emoji_list.search-private'), defaultMessage: 'Search Private Emoji'}}
+                                onChange={this.onSearchChange}
+                                style={style.search}
+                            />
+                        </div>
+                    </div>
+                    <span className='backstage-list__help'>
+                        <p>
+                            <FormattedMessage
+                                id='emoji_list.help'
+                                defaultMessage="Private emoji are only available to the ones that upload or save them. Type ':' followed by two characters in a message box to bring up the emoji selection menu."
+                            />
+                        </p>
+                        <p>
+                            <FormattedMessage
+                                id='emoji_list.help2'
+                                defaultMessage="Tip: If you add #, ##, or ### as the first character on a new line containing emoji, you can use larger sized emoji. To try it out, send a message such as: '# :smile:'."
+                            />
+                        </p>
+                    </span>
+                    <div className='backstage-list'>
+                        <table className='emoji-list__table'>
+                            <thead>
+                                <tr className='backstage-list__item emoji-list__table-header'>
+                                    <th className='emoji-list__name'>
+                                        <FormattedMessage
+                                            id='emoji_list.name'
+                                            defaultMessage='Name'
+                                        />
+                                    </th>
+                                    <th className='emoji-list__image'>
+                                        <FormattedMessage
+                                            id='emoji_list.image'
+                                            defaultMessage='Image'
+                                        />
+                                    </th>
+                                    <th className='emoji-list__creator'>
+                                        <FormattedMessage
+                                            id='emoji_list.creator'
+                                            defaultMessage='Creator'
+                                        />
+                                    </th>
+                                    <th className='emoji-list_actions'>
+                                        <FormattedMessage
+                                            id='emoji_list.actions'
+                                            defaultMessage='Actions'
+                                        />
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {emojis}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className='filter-controls pt-3'>
+                        {previousButton}
+                        {nextButton}
+                    </div>
+                </div>
+            );
+        }
         return (
             <div>
                 <div className='backstage-filters'>
@@ -242,7 +380,7 @@ export default class EmojiList extends React.PureComponent {
                         <LocalizedInput
                             type='search'
                             className='form-control'
-                            placeholder={{id: t('emoji_list.search'), defaultMessage: 'Search Custom Emoji'}}
+                            placeholder={{id: t('emoji_list.search'), defaultMessage: 'Search Public Emoji'}}
                             onChange={this.onSearchChange}
                             style={style.search}
                         />
@@ -252,7 +390,7 @@ export default class EmojiList extends React.PureComponent {
                     <p>
                         <FormattedMessage
                             id='emoji_list.help'
-                            defaultMessage="Custom emoji are available to everyone on your server. Type ':' followed by two characters in a message box to bring up the emoji selection menu."
+                            defaultMessage="Public emoji are available to everyone on your server. Type ':' followed by two characters in a message box to bring up the emoji selection menu."
                         />
                     </p>
                     <p>

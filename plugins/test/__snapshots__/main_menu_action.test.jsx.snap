@@ -290,6 +290,12 @@ exports[`plugins/MainMenuActions should match snapshot and click plugin item for
       text="Custom Emoji"
       to="/somename/emoji"
     />
+    <MenuItemLink
+      id="privateEmojis"
+      show={true}
+      text="Private Emoji"
+      to="/somename/emoji_private"
+    />
   </MenuGroup>
   <MenuGroup>
     <Connect(SystemPermissionGate)

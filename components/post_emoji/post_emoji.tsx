@@ -14,10 +14,33 @@ declare module 'react' {
 }
 
 export default class PostEmoji extends React.PureComponent<PostEmojiProps, {}> {
+    state={
+        err: false
+    }
+
+    // componentDidMount(){
+    //     this.checkImage();
+    // }
+    // checkImage = async ()=>{
+    //     try{
+    //         const response = await Client4.doFetch<any>(
+    //             this.props.imageUrl,
+    //             {method: 'get'},
+    //         );
+    //         console.log(response);
+    //         if('error' in response){
+    //             this.setState({err:true});
+    //         }
+    //     }catch(e){
+    //         console.log(e);
+    //         this.setState({err:false});
+    //     }
+
+    // }
     public render() {
         const emojiText = ':' + this.props.name + ':';
 
-        if (!this.props.imageUrl) {
+        if (this.state.err || !this.props.imageUrl) {
             return emojiText;
         }
 

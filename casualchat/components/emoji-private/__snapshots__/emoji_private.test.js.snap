@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`casualchat/components/emoji-private should match snapshot 1`] = `
+<div
+  className="backstage-content emoji-list"
+>
+  <div
+    className="backstage-header"
+  >
+    <h1>
+      <FormattedMessage
+        defaultMessage="Private Emoji"
+        id="emoji_list.header-private"
+        values={Object {}}
+      />
+    </h1>
+    <Link
+      className="add-link"
+      to="/team-name/emoji_private/add_private"
+    >
+      <button
+        className="btn btn-primary"
+        type="button"
+      >
+        <FormattedMessage
+          defaultMessage="Add Private Emoji"
+          id="emoji_list.add-private"
+          values={Object {}}
+        />
+      </button>
+    </Link>
+  </div>
+  <Connect(EmojiList)
+    isPrivate={true}
+    scrollToTop={[MockFunction]}
+  />
+</div>
+`;
