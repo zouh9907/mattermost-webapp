@@ -6,14 +6,13 @@ import React from 'react';
 import {FormattedMessage} from 'react-intl';
 import {Link} from 'react-router-dom';
 
+import {If, Else, Then} from 'react-if';
+
 import BackstageHeader from 'components/backstage/components/backstage_header.jsx';
 import FormError from 'components/form_error';
 import SpinnerButton from 'components/spinner_button';
 import {browserHistory} from 'utils/browser_history';
 import {localizeMessage} from 'utils/utils.jsx';
-import {If,Else,Then} from 'react-if';
-
-
 
 export default class AddEmoji extends React.PureComponent {
     static propTypes = {
@@ -24,7 +23,7 @@ export default class AddEmoji extends React.PureComponent {
         emojiMap: PropTypes.object.isRequired,
         team: PropTypes.object,
         user: PropTypes.object,
-        shouldUploadPrivate: PropTypes.bool.isRequired
+        shouldUploadPrivate: PropTypes.bool.isRequired,
     };
 
     static contextTypes = {
@@ -120,19 +119,18 @@ export default class AddEmoji extends React.PureComponent {
             return;
         }
         let response;
-        if(shouldUploadPrivate){
-            response = await actions.createPrivateEmoji(emoji, image);   
-        }else{
+        if (shouldUploadPrivate) {
+            response = await actions.createPrivateEmoji(emoji, image);
+        } else {
             response = await actions.createCustomEmoji(emoji, image);
         }
-        console.log(response);
 
         if ('data' in response) {
             const savedEmoji = response;
             if (savedEmoji && savedEmoji.data.name === emoji.name) {
-                if(shouldUploadPrivate){
+                if (shouldUploadPrivate) {
                     browserHistory.push('/' + team.name + '/emoji_private');
-                }else{
+                } else {
                     browserHistory.push('/' + team.name + '/emoji');
                 }
                 return;
@@ -162,7 +160,6 @@ export default class AddEmoji extends React.PureComponent {
             saving: false,
             error: (genericError),
         });
-        
     };
 
     updateName = (e) => {
@@ -236,7 +233,7 @@ export default class AddEmoji extends React.PureComponent {
 
         return (
             <div className='backstage-content row'>
-            
+
                 <If condition={this.props.shouldUploadPrivate}>
                     <Then>
                         <BackstageHeader>
@@ -267,8 +264,7 @@ export default class AddEmoji extends React.PureComponent {
                         </BackstageHeader>
                     </Else>
                 </If>
-                    
-                
+
                 <div className='backstage-form'>
                     <form
                         className='form-horizontal'

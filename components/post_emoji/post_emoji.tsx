@@ -1,8 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React,{useState} from 'react';
-import {Client4} from 'mattermost-redux/client';
+import React from 'react';
 
 interface PostEmojiProps {
     name: string;
@@ -18,6 +17,7 @@ export default class PostEmoji extends React.PureComponent<PostEmojiProps, {}> {
     state={
         err: false
     }
+
     // componentDidMount(){
     //     this.checkImage();
     // }
@@ -35,7 +35,7 @@ export default class PostEmoji extends React.PureComponent<PostEmojiProps, {}> {
     //         console.log(e);
     //         this.setState({err:false});
     //     }
-        
+
     // }
     public render() {
         const emojiText = ':' + this.props.name + ':';

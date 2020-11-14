@@ -48,7 +48,6 @@ describe('components/backstage/components/BackstageSidebar', () => {
 
     // describe('private emoji', () => {
 
-
     //     it(`should render private emoji category`, () => {
     //         const wrapper = shallow(
     //             <BackstageSidebar {...defaultProps}/>,

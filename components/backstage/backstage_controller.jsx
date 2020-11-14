@@ -186,8 +186,8 @@ export default class BackstageController extends React.PureComponent {
                             path={'/:team/emoji_private'}
                             component={EmojiPrivate}
                         />
-                         <BackstageRoute
-                            extraProps={{...extraProps,shouldUploadPrivate: true}}
+                        <BackstageRoute
+                            extraProps={{...extraProps, shouldUploadPrivate: true}}
                             path={`${this.props.match.url}/add_private`}
                             component={AddEmoji}
                         />
@@ -197,13 +197,13 @@ export default class BackstageController extends React.PureComponent {
                             path={'/:team/emoji'}
                             component={Emoji}
                         />
-                        
+
                         <BackstageRoute
                             extraProps={{...extraProps, shouldUploadPrivate: false}}
                             path={`${this.props.match.url}/add`}
                             component={AddEmoji}
                         />
-                       
+
                         <BackstageRoute
                             extraProps={extraProps}
                             path={`${this.props.match.url}/bots/add`}

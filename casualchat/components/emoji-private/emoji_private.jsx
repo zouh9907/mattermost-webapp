@@ -6,10 +6,7 @@ import PropTypes from 'prop-types';
 import {FormattedMessage} from 'react-intl';
 import {Link} from 'react-router-dom';
 
-import Permissions from 'mattermost-redux/constants/permissions';
-
 import * as Utils from 'utils/utils.jsx';
-import AnyTeamPermissionGate from 'components/permissions_gates/any_team_permission_gate';
 
 import EmojiList from 'components/emoji/emoji_list';
 
@@ -57,23 +54,26 @@ export default class EmojiPage extends React.PureComponent {
                         />
                     </h1>
 
-                        <Link
-                            className='add-link'
-                            to={'/' + this.props.teamName + '/emoji_private/add_private'}
+                    <Link
+                        className='add-link'
+                        to={'/' + this.props.teamName + '/emoji_private/add_private'}
+                    >
+                        <button
+                            type='button'
+                            className='btn btn-primary'
                         >
-                            <button
-                                type='button'
-                                className='btn btn-primary'
-                            >
-                                <FormattedMessage
-                                    id='emoji_list.add-private'
-                                    defaultMessage='Add Private Emoji'
-                                />
-                            </button>
-                        </Link>
+                            <FormattedMessage
+                                id='emoji_list.add-private'
+                                defaultMessage='Add Private Emoji'
+                            />
+                        </button>
+                    </Link>
 
                 </div>
-                <EmojiList scrollToTop={this.props.scrollToTop} isPrivate={true}/>
+                <EmojiList
+                    scrollToTop={this.props.scrollToTop}
+                    isPrivate={true}
+                />
             </div>
         );
     }

@@ -49,8 +49,6 @@ export default class BackstageSidebar extends React.PureComponent {
     }
 
     renderPrivateEmoji() {
-        
-
         return (
             <BackstageCategory
                 name='emoji_private'
@@ -199,11 +197,11 @@ export default class BackstageSidebar extends React.PureComponent {
         return (
             <div className='backstage-sidebar'>
                 <ul>
-                
+
                     {this.renderCustomEmoji()}
                     {this.renderPrivateEmoji()}
                     {this.renderIntegrations()}
-                    
+
                 </ul>
             </div>
         );

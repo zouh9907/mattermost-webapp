@@ -4,15 +4,19 @@
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
-import {getCustomEmojiIdsSortedByName} from 'mattermost-redux/selectors/entities/emojis';
+//import {getCustomEmojiIdsSortedByName} from 'mattermost-redux/selectors/entities/emojis';
 
 import {getCustomEmojis, searchCustomEmojis} from 'mattermost-redux/actions/emojis';
-import {getPrivateEmojis, searchPrivateEmojis} from 'casualchat/actions/emojis';
+
 import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
+
+import {getPrivateEmojis, searchPrivateEmojis} from 'casualchat/actions/emojis';
+
 import EmojiList from './emoji_list.jsx';
 
 function mapStateToProps(state) {
     return {
+
         //emojiIds: getCustomEmojiIdsSortedByName(state) || [],
         userId: getCurrentUserId(state),
     };
@@ -24,7 +28,7 @@ function mapDispatchToProps(dispatch) {
             getCustomEmojis,
             searchCustomEmojis,
             getPrivateEmojis,
-            searchPrivateEmojis
+            searchPrivateEmojis,
         }, dispatch),
     };
 }
