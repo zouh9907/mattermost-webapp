@@ -24,7 +24,7 @@ describe('components/emoji/components/AddEmoji', () => {
             createCustomEmoji: jest.fn().mockReturnValue({}),
             createPrivateEmoji: jest.fn().mockReturnValue({}),
         },
-        shouldUploadPrivate: false
+        shouldUploadPrivate: false,
     };
 
     test('should match snapshot', () => {
