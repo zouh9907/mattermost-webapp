@@ -100,7 +100,7 @@ export function messageHtmlToComponent(html, isRHS, options = {}) {
             processNode: (node) => {
                 const emojiName = node.attribs[emojiAttrib];
 
-                return <PostEmoji name={emojiName}/>;
+                return <PostEmoji name={emojiName} userId={options.postUserId}/>;
             },
         });
     }

@@ -18,8 +18,6 @@ export async function createPrivateEmoji(emoji: CustomEmoji, imageData: File): P
     Client4.trackEvent('api', 'api_emoji_custom_add_private');
 
     const formData = new FormData();
-
-    // formData.append('userID',userID);
     formData.append('image', imageData);
     formData.append('emoji', JSON.stringify(emoji));
     const request: any = {
@@ -54,16 +52,10 @@ export async function getPrivateEmojis(userID: string, page: number, perPage: nu
         `${getPrivateEmojisRoute()}${buildQueryString({page, per_page: perPage, sort})}`,
         {method: 'get'},
     );
-
-    // console.log("userId =", userID);
-    // console.log("page =", page);
-    // console.log("perPage =", perPage);
-    // console.log("sort =", sort);
-
-    //return Promise.resolve([]);
 }
 
 export async function searchPrivateEmoji(userID: string, term: string, options = {}): Promise<Emoji[]> {
+    //TODO: After backend is finished
     // return Client4.doFetch<CustomEmoji[]>(
     //     `${Client4.getEmojisRoute()}/search`,
     //     {method: 'post', body: JSON.stringify({term, ...options})},
@@ -77,4 +69,19 @@ export async function searchPrivateEmoji(userID: string, term: string, options =
     return Promise.resolve([]);
 }
 
-export default {createPrivateEmoji, getEmojiUrlByUser, getPrivateEmojis, searchPrivateEmoji};
+export async function checkEmojiAccess(userid: string, emoji: Emoji|undefined): Promise<boolean>{
+    if(emoji===undefined){
+        return false;
+    }
+    if (isCustomEmoji(emoji)) {
+        const url = `${getPrivateEmojiRoute(emoji.id)}/checkprivate${buildQueryString({userid})}`;
+        return Client4.doFetch<boolean>(
+            url,
+            {method: 'get'},
+        );
+    }else{
+        return true;
+    }
+}
+
+export default {createPrivateEmoji, getEmojiUrlByUser, getPrivateEmojis, searchPrivateEmoji, checkEmojiAccess};

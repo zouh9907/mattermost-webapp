@@ -98,6 +98,11 @@ type Props = {
      * Post id prop passed down to markdown image
      */
     postType?: PostType;
+    /**
+     * User who sent this post
+     */
+    postUserId? : string;
+    
     emojiMap: EmojiMap;
 }
 
@@ -128,6 +133,7 @@ export default class Markdown extends React.PureComponent<Props> {
 
         const htmlFormattedText = formatText(this.props.message, options, this.props.emojiMap);
         return messageHtmlToComponent(htmlFormattedText, this.props.isRHS, {
+            postUserId: this.props.postUserId,
             imageProps: this.props.imageProps,
             imagesMetadata: this.props.imagesMetadata,
             hasPluginTooltips: this.props.hasPluginTooltips,
