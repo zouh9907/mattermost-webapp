@@ -2,29 +2,27 @@
 // See LICENSE.txt for license information.
 
 import React from 'react';
-import { checkEmojiAccess } from 'casualchat/CasualChatClient';
-import { Emoji } from 'mattermost-redux/types/emojis';
-import OverlayTrigger from 'components/overlay_trigger';
-import Menu from 'components/widgets/menu/menu';
-import MenuWrapper from 'components/widgets/menu/menu_wrapper';
-import ChannelPermissionGate from 'components/permissions_gates/channel_permission_gate';
-import DotsHorizontalIcon from 'components/widgets/icons/dots_horizontal';
-import Pluggable from 'plugins/pluggable';
-import DotMenu from 'components/dot_menu/dot_menu'
-import { Modal } from 'react-bootstrap';
-import * as Utils from 'utils/utils.jsx';
-import { FormattedMessage } from 'react-intl';
-import { Tooltip } from 'react-bootstrap';
-import Constants from 'utils/constants';
-import { If, Then, Else } from 'react-if';
 
-const MENU_BOTTOM_MARGIN = 80;
+import {Emoji} from 'mattermost-redux/types/emojis';
+
+import {FormattedMessage} from 'react-intl';
+
+import {Tooltip} from 'react-bootstrap';
+
+import {If, Then, Else} from 'react-if';
+
+import OverlayTrigger from 'components/overlay_trigger';
 
 interface PostEmojiProps {
     name: string;
     imageUrl: string;
     userId: string;
+    viewerUserId: string;
     emoji: Emoji | undefined;
+    clientFuncs: {
+        checkEmojiAccess: (userId: string, emoji: Emoji|undefined) => Promise<boolean>;
+        savePrivateEmoji: (userId: string, emoji: Emoji|undefined) => Promise<any>;
+    };
 }
 
 interface PostEmojiState {
@@ -56,35 +54,20 @@ export default class PostEmoji extends React.PureComponent<PostEmojiProps, PostE
     }
     checkImage = async () => {
         try {
-            const canSenderAccess = await checkEmojiAccess(this.props.userId, this.props.emoji);
-            this.setState({ canSenderAccess });
+            const canSenderAccess = await this.props.clientFuncs.checkEmojiAccess(this.props.userId, this.props.emoji);
+            const canViewerAccess = await this.props.clientFuncs.checkEmojiAccess(this.props.viewerUserId, this.props.emoji);
+            this.setState({canSenderAccess, canViewerAccess});
         } catch (e) {
-            console.log(e);
-            this.setState({ canSenderAccess: false });
+            this.setState({canSenderAccess: false, canViewerAccess: false});
         }
-
     }
-    // onHide(){
-    //     this.setState({showMenu: false});
-    // }
 
-    // refCallback = (menuRef: Menu) => {
-    //     if (menuRef && this.buttonRef) {
-    //         const rect = menuRef.rect();
-    //         const buttonRect = this.buttonRef.current.getBoundingClientRect();
-    //         const y = typeof buttonRect.y === 'undefined' ? buttonRect.top : buttonRect.y;
-    //         const windowHeight = window.innerHeight;
-
-    //         const totalSpace = windowHeight - MENU_BOTTOM_MARGIN;
-    //         const spaceOnTop = y - Constants.CHANNEL_HEADER_HEIGHT;
-    //         const spaceOnBottom = (totalSpace - (spaceOnTop + Constants.POST_AREA_HEIGHT));
-
-    //         this.setState({
-    //             openUp: (spaceOnTop > spaceOnBottom),
-    //             width: rect.width,
-    //         });
-    //     }
-    // }
+    saveImage = async () => {
+        if (!this.state.canViewerAccess) {
+            await this.props.clientFuncs.savePrivateEmoji(this.props.viewerUserId, this.props.emoji);
+            await this.checkImage();
+        }
+    }
 
     public render() {
         const emojiText = ':' + this.props.name + ':';
@@ -96,30 +79,31 @@ export default class PostEmoji extends React.PureComponent<PostEmojiProps, PostE
         return (
 
             <OverlayTrigger
+
                 // className='hidden-xs'
                 delayShow={500}
                 placement='top'
-                overlay={<Tooltip
-                    id='dotmenu-icon-tooltip'
-                    className='hidden-xs'
-                >
-                    {emojiText}<br />
-                    <If condition={this.state.canViewerAccess}>
-                        <Then>
-                            <FormattedMessage
-                                id='post_emoji.saved'
-                                defaultMessage='Added'
-                            />
-                        </Then>
-                        <Else>
-                            <FormattedMessage
-                                id='post_emoji.not_saved'
-                                defaultMessage='Click to Add'
-                            />
-                        </Else>
-                    </If>
-
-                </Tooltip>}
+                overlay={
+                    <Tooltip
+                        id='dotmenu-icon-tooltip'
+                        className='hidden-xs'
+                    >
+                        {emojiText}<br/>
+                        <If condition={this.state.canViewerAccess}>
+                            <Then>
+                                <FormattedMessage
+                                    id='post_emoji.saved'
+                                    defaultMessage='Added'
+                                />
+                            </Then>
+                            <Else>
+                                <FormattedMessage
+                                    id='post_emoji.not_saved'
+                                    defaultMessage='Click to Add'
+                                />
+                            </Else>
+                        </If>
+                    </Tooltip>}
                 rootClose={true}
             >
                 <span
@@ -127,16 +111,13 @@ export default class PostEmoji extends React.PureComponent<PostEmojiProps, PostE
                     className='emoticon'
                     style={{
                         backgroundImage: 'url(' + this.props.imageUrl + ')',
-                        cursor: "pointer"
+                        cursor: 'pointer'
                     }}
-
+                    onClick={this.saveImage.bind(this)}
                 >
                     {emojiText}
                 </span>
             </OverlayTrigger>
-
-
-
 
         );
     }

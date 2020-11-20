@@ -98,11 +98,12 @@ type Props = {
      * Post id prop passed down to markdown image
      */
     postType?: PostType;
+
     /**
      * User who sent this post
      */
     postUserId? : string;
-    
+
     emojiMap: EmojiMap;
 }
 
