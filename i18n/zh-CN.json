@@ -2307,6 +2307,8 @@
   "post_info.system": "系统",
   "post_info.tooltip.add_reactions": "添加互动",
   "post_info.unpin": "从频道取消置顶",
+  "post_emoji.not_saved": "点击以添加",
+  "post_emoji.saved": "已添加",
   "post_message_view.edited": "(已编辑)",
   "posts_view.loadMore": "载入更多消息",
   "posts_view.newMsg": "新消息",

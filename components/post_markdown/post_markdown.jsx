@@ -92,6 +92,7 @@ export default class PostMarkdown extends React.PureComponent {
                 hasPluginTooltips={this.props.hasPluginTooltips}
                 imagesMetadata={this.props.post && this.props.post.metadata && this.props.post.metadata.images}
                 postId={this.props.post && this.props.post.id}
+                postUserId={this.props.post && this.props.post.user_id}
             />
         );
     }

@@ -10,16 +10,10 @@ function getPrivateEmojisRoute() {
     return `${Client4.getEmojisRoute()}/private`;
 }
 
-function getPrivateEmojiRoute(id: string) {
-    return `${Client4.getEmojiRoute(id)}`;
-}
-
 export async function createPrivateEmoji(emoji: CustomEmoji, imageData: File): Promise<any> {
     Client4.trackEvent('api', 'api_emoji_custom_add_private');
 
     const formData = new FormData();
-
-    // formData.append('userID',userID);
     formData.append('image', imageData);
     formData.append('emoji', JSON.stringify(emoji));
     const request: any = {
@@ -41,7 +35,7 @@ export async function createPrivateEmoji(emoji: CustomEmoji, imageData: File): P
 
 export function getEmojiUrlByUser(userid: string, emoji: Emoji): string {
     if (isCustomEmoji(emoji)) {
-        const url = `${getPrivateEmojiRoute(emoji.id)}/privateimage${buildQueryString({userid})}`;
+        const url = `${Client4.getEmojiRoute(emoji.id)}/privateimage${buildQueryString({userid})}`;
         return url;
     }
 
@@ -54,16 +48,10 @@ export async function getPrivateEmojis(userID: string, page: number, perPage: nu
         `${getPrivateEmojisRoute()}${buildQueryString({page, per_page: perPage, sort})}`,
         {method: 'get'},
     );
-
-    // console.log("userId =", userID);
-    // console.log("page =", page);
-    // console.log("perPage =", perPage);
-    // console.log("sort =", sort);
-
-    //return Promise.resolve([]);
 }
 
 export async function searchPrivateEmoji(userID: string, term: string, options = {}): Promise<Emoji[]> {
+    //TODO: After backend is finished
     // return Client4.doFetch<CustomEmoji[]>(
     //     `${Client4.getEmojisRoute()}/search`,
     //     {method: 'post', body: JSON.stringify({term, ...options})},
@@ -77,4 +65,28 @@ export async function searchPrivateEmoji(userID: string, term: string, options =
     return Promise.resolve([]);
 }
 
-export default {createPrivateEmoji, getEmojiUrlByUser, getPrivateEmojis, searchPrivateEmoji};
+export async function checkEmojiAccess(userid: string, emoji: Emoji|undefined): Promise<boolean> {
+    if (emoji === undefined) {
+        return false;
+    }
+    if (isCustomEmoji(emoji)) {
+        const url = `${Client4.getEmojiRoute(emoji.id)}/checkprivate${buildQueryString({userid})}`;
+        return Client4.doFetch<boolean>(
+            url,
+            {method: 'get'},
+        );
+    }
+    return true;
+}
+
+export async function savePrivateEmoji(userid: string, emoji: Emoji|undefined): Promise<any> {
+    if (emoji !== undefined && isCustomEmoji(emoji)) {
+        const url = `${Client4.getEmojiRoute(emoji.id)}/save${buildQueryString({userid})}`;
+        await Client4.doFetch<any>(
+            url,
+            {method: 'post'},
+        );
+    }
+}
+
+export default {createPrivateEmoji, getEmojiUrlByUser, getPrivateEmojis, searchPrivateEmoji, checkEmojiAccess, savePrivateEmoji};

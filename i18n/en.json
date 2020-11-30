@@ -3259,6 +3259,8 @@
   "post_delete.notPosted": "Comment could not be posted",
   "post_delete.okay": "Okay",
   "post_delete.someone": "Someone deleted the message on which you tried to post a comment.",
+  "post_emoji.not_saved": "Click to Add",
+  "post_emoji.saved": "Added",
   "post_info.auto_responder": "AUTOMATIC REPLY",
   "post_info.bot": "BOT",
   "post_info.comment_icon.tooltip.reply": "Reply",
