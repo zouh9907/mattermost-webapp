@@ -8,6 +8,7 @@ import {getUser, getCurrentUserId} from 'mattermost-redux/selectors/entities/use
 import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 
 import {deleteCustomEmoji} from 'mattermost-redux/actions/emojis';
+import {removeEmojiAccess} from 'casualchat/actions/emojis';
 
 import {getDisplayNameByUser} from 'utils/utils.jsx';
 
@@ -30,6 +31,7 @@ function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({
             deleteCustomEmoji,
+            removeEmojiAccess
         }, dispatch),
     };
 }

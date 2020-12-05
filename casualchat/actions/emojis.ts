@@ -66,3 +66,43 @@ export function searchPrivateEmojis(term: string, options: any = {}, userID: str
         return {data};
     };
 }
+
+export function deletePrivateEmoji(emojiId: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        try {
+            await CasualChatClient.deletePrivateEmoji(emojiId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+
+            dispatch(logError(error));
+            return {error};
+        }
+
+        dispatch({
+            type: EmojiTypes.DELETED_CUSTOM_EMOJI,
+            data: {id: emojiId},
+        });
+
+        return {data: true};
+    };
+}
+
+export function removeEmojiAccess(emojiId: string, userID: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        try {
+            await CasualChatClient.removeEmojiAccess(userID,emojiId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+
+            dispatch(logError(error));
+            return {error};
+        }
+
+        dispatch({
+            type: EmojiTypes.DELETED_CUSTOM_EMOJI,
+            data: {id: emojiId},
+        });
+
+        return {data: true};
+    };
+}
