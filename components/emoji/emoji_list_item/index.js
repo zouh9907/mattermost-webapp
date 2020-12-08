@@ -7,7 +7,7 @@ import {bindActionCreators} from 'redux';
 import {getUser, getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
 import {getCurrentTeam} from 'mattermost-redux/selectors/entities/teams';
 
-import {deleteCustomEmoji} from 'mattermost-redux/actions/emojis';
+import {removeEmojiAccess, deleteEmojiWithAccess} from 'casualchat/actions/emojis';
 
 import {getDisplayNameByUser} from 'utils/utils.jsx';
 
@@ -29,7 +29,8 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return {
         actions: bindActionCreators({
-            deleteCustomEmoji,
+            deleteEmojiWithAccess,
+            removeEmojiAccess,
         }, dispatch),
     };
 }
