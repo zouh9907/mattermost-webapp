@@ -4,15 +4,16 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
 
+import {If, Then, Else} from 'react-if';
+
 import DeleteModalTrigger from 'components/delete_modal_trigger';
 import WarningIcon from 'components/widgets/icons/fa_warning_icon';
-import {If, Then, Else} from 'react-if';
 
 export default class DeleteEmoji extends DeleteModalTrigger {
     static propTypes = {
         onDelete: PropTypes.func.isRequired,
         isPrivate: PropTypes.bool.isRequired,
-        isOwner: PropTypes.bool
+        isOwner: PropTypes.bool,
     }
 
     get triggerTitle() {
@@ -31,7 +32,7 @@ export default class DeleteEmoji extends DeleteModalTrigger {
                     />
                 </Else>
             </If>
-            
+
         );
     }
 
@@ -59,29 +60,40 @@ export default class DeleteEmoji extends DeleteModalTrigger {
             <div className='alert alert-warning'>
                 <WarningIcon additionalClassName='mr-1'/>
                 <If condition={this.props.isPrivate && !this.props.isOwner}>
-                <Then>
-                    <FormattedMessage
-                        id='emoji_list.remove_access.confirm.msg'
-                        defaultMessage='This action removes your access to the emoji. Are you sure you want to remove it?'
-                    />
-                </Then>
-                <Else>
-                    <FormattedMessage
-                        id='emoji_list.delete.confirm.msg'
-                        defaultMessage='This action permanently deletes the emoji. Are you sure you want to delete it?'
-                    />
-                </Else>
-            </If>
+                    <Then>
+                        <FormattedMessage
+                            id='emoji_list.remove_access.confirm.msg'
+                            defaultMessage='This action removes your access to the emoji. Are you sure you want to remove it?'
+                        />
+                    </Then>
+                    <Else>
+                        <FormattedMessage
+                            id='emoji_list.delete.confirm.msg'
+                            defaultMessage='This action permanently deletes the emoji. Are you sure you want to delete it?'
+                        />
+                    </Else>
+                </If>
             </div>
         );
     }
 
     get modalConfirmButton() {
         return (
-            <FormattedMessage
-                id='emoji_list.delete.confirm.button'
-                defaultMessage='Delete'
-            />
+            <If condition={this.props.isPrivate && !this.props.isOwner}>
+                <Then>
+                    <FormattedMessage
+                        id='emoji_list.remove_access.confirm.button'
+                        defaultMessage='Remove Access'
+                    />
+                </Then>
+                <Else>
+                    <FormattedMessage
+                        id='emoji_list.delete.confirm.button'
+                        defaultMessage='Delete'
+                    />
+                </Else>
+            </If>
+
         );
     }
 }

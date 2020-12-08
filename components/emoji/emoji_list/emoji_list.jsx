@@ -174,7 +174,7 @@ export default class EmojiList extends React.PureComponent {
         }, EMOJI_SEARCH_DELAY_MILLISECONDS);
     }
 
-    onDeleteEmoji = (emojiId) =>{
+    onDeleteEmoji = (emojiId) => {
         this.deleteFromSearch(emojiId);
         this.deleteFromIds(emojiId);
     }
@@ -184,15 +184,15 @@ export default class EmojiList extends React.PureComponent {
             return;
         }
 
-        this.setState({searchEmojis: this.state.searchEmojis.filter(id=>id!=emojiId)});
+        this.setState({searchEmojis: this.state.searchEmojis.filter((id) => id !== emojiId)});
     }
 
-    deleteFromIds =(emojiId) =>{
+    deleteFromIds =(emojiId) => {
         if (!this.state.emojiIds) {
             return;
         }
 
-        this.setState({emojiIds: this.state.emojiIds.filter(id=>id!=emojiId)});
+        this.setState({emojiIds: this.state.emojiIds.filter((id) => id !== emojiId)});
     }
 
     render() {

@@ -67,10 +67,10 @@ export function searchPrivateEmojis(term: string, options: any = {}, userID: str
     };
 }
 
-export function deletePrivateEmoji(emojiId: string): ActionFunc {
+export function deleteEmojiWithAccess(emojiId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
-            await CasualChatClient.deletePrivateEmoji(emojiId);
+            await CasualChatClient.deleteEmojiWithAccess(emojiId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
 
@@ -87,10 +87,10 @@ export function deletePrivateEmoji(emojiId: string): ActionFunc {
     };
 }
 
-export function removeEmojiAccess(emojiId: string, userID: string): ActionFunc {
+export function removeEmojiAccess(emojiId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
-            await CasualChatClient.removeEmojiAccess(userID,emojiId);
+            await CasualChatClient.removeEmojiAccess(emojiId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
 

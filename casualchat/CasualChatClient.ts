@@ -89,15 +89,18 @@ export async function savePrivateEmoji(userid: string, emoji: Emoji|undefined): 
     }
 }
 
-export async function deletePrivateEmoji(emojiId: string): Promise<any> {
+export async function deleteEmojiWithAccess(emojiId: string): Promise<any> {
     return Client4.doFetch<any>(
-        `${Client4.getEmojiRoute(emojiId)}`,
+        `${Client4.getEmojiRoute(emojiId)}/withAccess`,
         {method: 'delete'},
     );
-};
-
-export async function removeEmojiAccess(emojiId: string, userId: string): Promise<any>{
-    return Promise.resolve(true);
 }
 
-export default {createPrivateEmoji, getEmojiUrlByUser, getPrivateEmojis, searchPrivateEmoji, checkEmojiAccess, savePrivateEmoji, deletePrivateEmoji,removeEmojiAccess};
+export async function removeEmojiAccess(emojiId: string): Promise<any> {
+    return Client4.doFetch<any>(
+        `${Client4.getEmojiRoute(emojiId)}/access`,
+        {method: 'delete'},
+    );
+}
+
+export default {createPrivateEmoji, getEmojiUrlByUser, getPrivateEmojis, searchPrivateEmoji, checkEmojiAccess, savePrivateEmoji, deleteEmojiWithAccess, removeEmojiAccess};

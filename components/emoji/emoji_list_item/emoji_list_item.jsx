@@ -19,7 +19,7 @@ export default class EmojiListItem extends React.PureComponent {
         currentTeam: PropTypes.object,
         onDelete: PropTypes.func,
         actions: PropTypes.shape({
-            deleteCustomEmoji: PropTypes.func.isRequired,
+            deleteEmojiWithAccess: PropTypes.func.isRequired,
             removeEmojiAccess: PropTypes.func.isRequired,
         }).isRequired,
         isPrivate: PropTypes.bool.isRequired,
@@ -36,14 +36,14 @@ export default class EmojiListItem extends React.PureComponent {
         if (this.props.onDelete) {
             this.props.onDelete(this.props.emoji.id);
         }
-        this.props.actions.deleteCustomEmoji(this.props.emoji.id);
+        this.props.actions.deleteEmojiWithAccess(this.props.emoji.id);
     }
 
-    handleRemoveAccessPrivate = ()=>{
+    handleRemoveAccessPrivate = () => {
         if (this.props.onDelete) {
             this.props.onDelete(this.props.emoji.id);
         }
-        this.props.actions.removeEmojiAccess(this.props.emoji.id, this.props.currentUserId);
+        this.props.actions.removeEmojiAccess(this.props.emoji.id);
     }
 
     render() {
@@ -56,17 +56,30 @@ export default class EmojiListItem extends React.PureComponent {
         }
 
         let deleteButton = null;
-        if(this.props.isPrivate){
+        if (this.props.isPrivate) {
             if (emoji.creator_id === this.props.currentUserId) {
-                deleteButton = <DeleteEmoji onDelete={this.handleDelete} isPrivate={this.props.isPrivate} isOwner={true}/>;
+                deleteButton = (
+                    <DeleteEmoji
+                        onDelete={this.handleDelete}
+                        isPrivate={this.props.isPrivate}
+                        isOwner={true}
+                    />);
             } else {
-                deleteButton = <DeleteEmoji onDelete={this.handleRemoveAccessPrivate} isPrivate={this.props.isPrivate} isOwner={false}/>;
+                deleteButton = (
+                    <DeleteEmoji
+                        onDelete={this.handleRemoveAccessPrivate}
+                        isPrivate={this.props.isPrivate}
+                        isOwner={false}
+                    />);
             }
-        }else{
+        } else {
             deleteButton = (
                 <AnyTeamPermissionGate permissions={[Permissions.DELETE_EMOJIS]}>
                     <AnyTeamPermissionGate permissions={[Permissions.DELETE_OTHERS_EMOJIS]}>
-                        <DeleteEmoji onDelete={this.handleDelete} isPrivate={this.props.isPrivate}/>
+                        <DeleteEmoji
+                            onDelete={this.handleDelete}
+                            isPrivate={this.props.isPrivate}
+                        />
                     </AnyTeamPermissionGate>
                 </AnyTeamPermissionGate>
             );
