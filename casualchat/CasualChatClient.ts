@@ -48,11 +48,10 @@ export async function getPrivateEmojis(userID: string, page: number, perPage: nu
         `${getPrivateEmojisRoute()}${buildQueryString({page, per_page: perPage, sort})}`,
         {method: 'get'},
     );
-    if(result==null){
-        return Promise.resolve([])
-    }else{
-        return Promise.resolve(result);
+    if (result == null) {
+        return Promise.resolve([]);
     }
+    return Promise.resolve(result);
 }
 
 export async function searchPrivateEmoji(userID: string, term: string, options = {}): Promise<Emoji[]> {
