@@ -33,9 +33,9 @@ export async function createPrivateEmoji(emoji: CustomEmoji, imageData: File): P
     );
 }
 
-export function getEmojiUrlByUser(userid: string, emoji: Emoji): string {
+export function getEmojiUrl(emoji: Emoji): string {
     if (isCustomEmoji(emoji)) {
-        const url = `${Client4.getEmojiRoute(emoji.id)}/privateimage${buildQueryString({userid})}`;
+        const url = Client4.getCustomEmojiImageUrl(emoji.id);
         return url;
     }
 
@@ -44,10 +44,15 @@ export function getEmojiUrlByUser(userid: string, emoji: Emoji): string {
 }
 
 export async function getPrivateEmojis(userID: string, page: number, perPage: number, sort: string): Promise<Emoji[]> {
-    return Client4.doFetch<Emoji[]>(
+    const result = await Client4.doFetch<Emoji[]>(
         `${getPrivateEmojisRoute()}${buildQueryString({page, per_page: perPage, sort})}`,
         {method: 'get'},
     );
+    if(result==null){
+        return Promise.resolve([])
+    }else{
+        return Promise.resolve(result);
+    }
 }
 
 export async function searchPrivateEmoji(userID: string, term: string, options = {}): Promise<Emoji[]> {
@@ -103,4 +108,4 @@ export async function removeEmojiAccess(emojiId: string): Promise<any> {
     );
 }
 
-export default {createPrivateEmoji, getEmojiUrlByUser, getPrivateEmojis, searchPrivateEmoji, checkEmojiAccess, savePrivateEmoji, deleteEmojiWithAccess, removeEmojiAccess};
+export default {createPrivateEmoji, getEmojiUrl, getPrivateEmojis, searchPrivateEmoji, checkEmojiAccess, savePrivateEmoji, deleteEmojiWithAccess, removeEmojiAccess};
