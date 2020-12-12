@@ -5,7 +5,7 @@ import {connect} from 'react-redux';
 
 import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
 
-import {checkEmojiAccess, savePrivateEmoji, getEmojiUrlByUser} from 'casualchat/CasualChatClient';
+import {checkEmojiAccess, savePrivateEmoji, getEmojiUrl} from 'casualchat/CasualChatClient';
 
 import {getEmojiMap} from 'selectors/emojis';
 
@@ -24,7 +24,7 @@ function mapStateToProps(state: GlobalState, ownProps: Props) {
     const currentUserId = getCurrentUserId(state);
 
     return {
-        imageUrl: emoji ? getEmojiUrlByUser(ownProps.userId, emoji) : '',
+        imageUrl: emoji ? getEmojiUrl(emoji) : '',
         emoji,
         viewerUserId: currentUserId,
         clientFuncs: {
