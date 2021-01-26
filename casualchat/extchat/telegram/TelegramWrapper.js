@@ -5,11 +5,27 @@ import TdClient from 'casualchat/tdweb';
 let client;
 let isReadyToSendCode = false;
 
-export function startClient(phoneNumber) {
+export function startClient(phoneNumber,whackyLinkCallback) {
     client = new TdClient({
-        onUpdate: createUpdateFunction(phoneNumber),
+        onUpdate: createUpdateFunction(phoneNumber,whackyLinkCallback),
+        jsLogVerbosityLevel: "INFO",
+        instanceName: "casualchat-tdweb",
+        isBackground: true
     });
+    //start();
 }
+export const start = async () =>{
+    /* eslint-disable no-console */
+    console.log('starting');
+    const result = await send({
+        '@type': 'random',
+    });
+    /* eslint-disable no-console */
+    console.log('result');
+    /* eslint-disable no-console */
+    console.log(result);
+};
+
 
 export async function sendVerificationCode(code) {
     if (!isReadyToSendCode) {
@@ -18,12 +34,25 @@ export async function sendVerificationCode(code) {
     await checkAuthenticationCode(code);
 }
 
+export async function logOut() {
+    /* eslint-disable no-console */
+    console.log('Logging Out');
+    const result = await send({
+        '@type': 'logout',
+    });
+    /* eslint-disable no-console */
+    console.log('result');
+    /* eslint-disable no-console */
+    console.log(result);
+}
+
 const send = async (messageObject) => {
     return client.send(messageObject);
 };
 
-const createUpdateFunction = (phoneNumber) => {
+const createUpdateFunction = (phoneNumber,whackyLinkCallback) => {
     return (updateObject) => {
+        console.log(updateObject);
         if (updateObject['@type'] === 'updateAuthorizationState') {
             if (updateObject.authorization_state['@type'] === 'authorizationStateWaitTdlibParameters') {
                 setTdLibParameters();
@@ -35,6 +64,10 @@ const createUpdateFunction = (phoneNumber) => {
                 isReadyToSendCode = true;
                 /* eslint-disable no-console */
                 console.log('Ready for code');
+            } else if (updateObject.authorization_state['@type'] === 'authorizationStateReady') {
+                /* eslint-disable no-console */
+                console.log('Ready to go');
+                whackyLinkCallback();
             }
         }
     };

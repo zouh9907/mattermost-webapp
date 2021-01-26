@@ -13,6 +13,7 @@
     "@types/uuid": "8.3.0",
     "@typescript-eslint/parser": "2.7.0",
     "bootstrap": "3.4.1",
+    "broadcast-channel": "3.3.0",
     "chart.js": "2.9.3",
     "compass-mixins": "0.12.10",
     "core-js": "3.6.5",

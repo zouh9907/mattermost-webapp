@@ -62,8 +62,10 @@ export default class ExtChatTab extends React.PureComponent {
             deauthorizeOAuthApp: PropTypes.func.isRequired,
         }),
         telegram: PropTypes.shape({
+            logOut: PropTypes.func.isRequired,
             sendVerificationCode: PropTypes.func.isRequired,
             startClient: PropTypes.func.isRequired,
+            start: PropTypes.func.isRequired,
         }),
     }
 
@@ -82,6 +84,7 @@ export default class ExtChatTab extends React.PureComponent {
         return {
             phoneNumber: '',
             code: '',
+            telegramWhackilyLinked: false,
             phoneNumberError: '',
             codeError: '',
             serverError: '',
@@ -203,14 +206,12 @@ export default class ExtChatTab extends React.PureComponent {
         }
     }
 
-    createPasswordSection = () => {
+    createTelegramSection = () => {
         if (this.props.activeSection === SECTION_TELEGRAM) {
             const inputs = [];
             let submit;
-
-            if (this.props.user.auth_service === '') {
                 submit = this.submitPassword;
-
+            if(this.state.telegramWhackilyLinked){
                 inputs.push(
                     <div
                         key='PhoneUpdateForm'
@@ -218,7 +219,34 @@ export default class ExtChatTab extends React.PureComponent {
                     >
                         <label className='col-sm-5 control-label'>
                             <FormattedMessage
-                                id='user.settings.security.phone_number'
+                                id='user.settings.extchat.telegram.linked'
+                                defaultMessage='You have linked your Telegram account'
+                            />
+                        </label>
+                        
+                        <SaveButton
+                            defaultMessage={
+                                <FormattedMessage
+                                    id='user.settings.extchat.telegram.unlink'
+                                    defaultMessage='Unlink Account'
+                                />}
+                            saving={false}
+                            disabled={false}
+                            onClick={() => {
+                               
+                            }}
+                        />
+                    </div>,
+                );
+            }else{
+                inputs.push(
+                    <div
+                        key='PhoneUpdateForm'
+                        className='form-group'
+                    >
+                        <label className='col-sm-5 control-label'>
+                            <FormattedMessage
+                                id='user.settings.extchat.telegram.phone_number'
                                 defaultMessage='Phone Number'
                             />
                         </label>
@@ -230,19 +258,21 @@ export default class ExtChatTab extends React.PureComponent {
                                 type='text'
                                 onChange={this.updatePhoneNumber}
                                 value={this.state.phoneNumber}
-                                aria-label={Utils.localizeMessage('user.settings.security.phone_number', 'Phone Number')}
+                                aria-label={Utils.localizeMessage('user.settings.extchat.telegram.phone_number', 'Phone Number')}
                             />
                         </div>
                         <SaveButton
                             defaultMessage={
                                 <FormattedMessage
-                                    id='user.settings.extchat.get_code'
+                                    id='user.settings.extchat.telegram.get_code'
                                     defaultMessage='Get Code'
                                 />}
                             saving={false}
                             disabled={false}
                             onClick={() => {
-                                this.props.telegram.startClient(this.state.phoneNumber);
+                                this.props.telegram.startClient(this.state.phoneNumber,()=>{
+                                    this.setState({telegramWhackilyLinked:true});
+                                });
                             }}
                         />
                     </div>,
@@ -254,7 +284,7 @@ export default class ExtChatTab extends React.PureComponent {
                     >
                         <label className='col-sm-5 control-label'>
                             <FormattedMessage
-                                id='user.settings.security.code'
+                                id='user.settings.extchat.telegram.code'
                                 defaultMessage='Verification Code'
                             />
                         </label>
@@ -265,31 +295,39 @@ export default class ExtChatTab extends React.PureComponent {
                                 type='text'
                                 onChange={this.updateCode}
                                 value={this.state.code}
-                                aria-label={Utils.localizeMessage('user.settings.security.code', 'Verification Code')}
+                                aria-label={Utils.localizeMessage('user.settings.extchat.telegram.code', 'Verification Code')}
                             />
                         </div>
                         <SaveButton
                             defaultMessage={
                                 <FormattedMessage
-                                    id='user.settings.extchat.verify_code'
+                                    id='user.settings.extchat.telegram.verify_code'
                                     defaultMessage='Verify Code'
                                 />}
                             saving={false}
                             disabled={false}
                             onClick={() => {
-                                this.props.telegram.sendVerificationCode(this.state.code);
+                                if(this.state.code==="secretlylogout"){
+                                    this.props.telegram.logOut();
+                                }else if(this.state.code==="secretlystart"){
+                                    this.props.telegram.start();
+                                }else{
+                                    this.props.telegram.sendVerificationCode(this.state.code);
+                                }
                             }}
                         />
                     </div>,
                 );
             }
+            
+            
 
             return (
                 <SettingItemMax
                     title={
                         <FormattedMessage
-                            id='user.settings.security.password'
-                            defaultMessage='Password'
+                            id='user.settings.extchat.telegram'
+                            defaultMessage='Telegram'
                         />
                     }
                     inputs={inputs}
@@ -302,81 +340,84 @@ export default class ExtChatTab extends React.PureComponent {
             );
         }
 
-        let describe;
+        // let describe;
 
-        if (this.props.user.auth_service === '') {
-            const d = new Date(this.props.user.last_password_update);
+        // if (this.props.user.auth_service === '') {
+        //     const d = new Date(this.props.user.last_password_update);
 
-            describe = (
-                <FormattedMessage
-                    id='user.settings.security.lastUpdated'
-                    defaultMessage='Last updated {date} at {time}'
-                    values={{
-                        date: (
-                            <FormattedDate
-                                value={d}
-                                day='2-digit'
-                                month='short'
-                                year='numeric'
-                            />
-                        ),
-                        time: (
-                            <FormattedTime
-                                value={d}
-                                hour12={!this.props.militaryTime}
-                                hour='2-digit'
-                                minute='2-digit'
-                            />
-                        ),
-                    }}
-                />
-            );
-        } else if (this.props.user.auth_service === Constants.GITLAB_SERVICE) {
-            describe = (
-                <FormattedMessage
-                    id='user.settings.security.loginGitlab'
-                    defaultMessage='Login done through GitLab'
-                />
-            );
-        } else if (this.props.user.auth_service === Constants.LDAP_SERVICE) {
-            describe = (
-                <FormattedMessage
-                    id='user.settings.security.loginLdap'
-                    defaultMessage='Login done through AD/LDAP'
-                />
-            );
-        } else if (this.props.user.auth_service === Constants.SAML_SERVICE) {
-            describe = (
-                <FormattedMessage
-                    id='user.settings.security.loginSaml'
-                    defaultMessage='Login done through SAML'
-                />
-            );
-        } else if (this.props.user.auth_service === Constants.GOOGLE_SERVICE) {
-            describe = (
-                <FormattedMessage
-                    id='user.settings.security.loginGoogle'
-                    defaultMessage='Login done through Google Apps'
-                />
-            );
-        } else if (this.props.user.auth_service === Constants.OFFICE365_SERVICE) {
-            describe = (
-                <FormattedMessage
-                    id='user.settings.security.loginOffice365'
-                    defaultMessage='Login done through Office 365'
-                />
-            );
-        }
+        //     describe = (
+        //         <FormattedMessage
+        //             id='user.settings.security.lastUpdated'
+        //             defaultMessage='Last updated {date} at {time}'
+        //             values={{
+        //                 date: (
+        //                     <FormattedDate
+        //                         value={d}
+        //                         day='2-digit'
+        //                         month='short'
+        //                         year='numeric'
+        //                     />
+        //                 ),
+        //                 time: (
+        //                     <FormattedTime
+        //                         value={d}
+        //                         hour12={!this.props.militaryTime}
+        //                         hour='2-digit'
+        //                         minute='2-digit'
+        //                     />
+        //                 ),
+        //             }}
+        //         />
+        //     );
+        // } else if (this.props.user.auth_service === Constants.GITLAB_SERVICE) {
+        //     describe = (
+        //         <FormattedMessage
+        //             id='user.settings.security.loginGitlab'
+        //             defaultMessage='Login done through GitLab'
+        //         />
+        //     );
+        // } else if (this.props.user.auth_service === Constants.LDAP_SERVICE) {
+        //     describe = (
+        //         <FormattedMessage
+        //             id='user.settings.security.loginLdap'
+        //             defaultMessage='Login done through AD/LDAP'
+        //         />
+        //     );
+        // } else if (this.props.user.auth_service === Constants.SAML_SERVICE) {
+        //     describe = (
+        //         <FormattedMessage
+        //             id='user.settings.security.loginSaml'
+        //             defaultMessage='Login done through SAML'
+        //         />
+        //     );
+        // } else if (this.props.user.auth_service === Constants.GOOGLE_SERVICE) {
+        //     describe = (
+        //         <FormattedMessage
+        //             id='user.settings.security.loginGoogle'
+        //             defaultMessage='Login done through Google Apps'
+        //         />
+        //     );
+        // } else if (this.props.user.auth_service === Constants.OFFICE365_SERVICE) {
+        //     describe = (
+        //         <FormattedMessage
+        //             id='user.settings.security.loginOffice365'
+        //             defaultMessage='Login done through Office 365'
+        //         />
+        //     );
+        // }
 
         return (
             <SettingItemMin
                 title={
                     <FormattedMessage
-                        id='user.settings.extchat.phone_number'
-                        defaultMessage='Phone Number'
+                        id='user.settings.extchat.telegram'
+                        defaultMessage='Telegram'
                     />
                 }
-                describe={describe}
+                describe={<FormattedMessage
+                                id='user.settings.extchat.telegram_describe'
+                                defaultMessage='Link your Mattermost account to your Telegram'
+                            />}
                 section={SECTION_TELEGRAM}
                 updateSection={this.handleUpdateSection}
                 focused={true}
@@ -385,7 +426,7 @@ export default class ExtChatTab extends React.PureComponent {
     }
 
     render() {
-        const passwordSection = this.createPasswordSection();
+        const telegramSection = this.createTelegramSection();
 
         // let numMethods = 0;
         // numMethods = this.props.enableSignUpWithGitLab ? numMethods + 1 : numMethods;
@@ -445,7 +486,7 @@ export default class ExtChatTab extends React.PureComponent {
                         />
                     </h3>
                     <div className='divider-dark first'/>
-                    {passwordSection}
+                    {telegramSection}
                     <div className='divider-light'/>
 
                 </div>

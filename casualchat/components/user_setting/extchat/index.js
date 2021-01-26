@@ -12,7 +12,7 @@ import {getBool} from 'mattermost-redux/selectors/entities/preferences';
 import {getPasswordConfig} from 'utils/utils.jsx';
 import {Preferences} from 'utils/constants';
 
-import {sendVerificationCode, startClient} from 'casualchat/extchat/telegram/TelegramWrapper';
+import {sendVerificationCode, startClient, logOut, start} from 'casualchat/extchat/telegram/TelegramWrapper';
 
 import ExtChatTab from './user_settings_extchat.jsx';
 
@@ -57,6 +57,8 @@ function mapDispatchToProps(dispatch) {
         telegram: {
             sendVerificationCode,
             startClient,
+            logOut,
+            start,
         },
     };
 }

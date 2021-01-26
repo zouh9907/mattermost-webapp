@@ -1,6 +1,6 @@
 class Logger {
   constructor() {
-    this.setVerbosity('WARNING');
+    this.setVerbosity('DEBUG');
   }
   debug(...str) {
     if (this.checkVerbosity(4)) {
