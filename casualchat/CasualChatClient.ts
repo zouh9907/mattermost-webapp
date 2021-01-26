@@ -107,4 +107,11 @@ export async function removeEmojiAccess(emojiId: string): Promise<any> {
     );
 }
 
+export async function linkAccount(externalPlatform: string, externalId: string): Promise<any> {
+    return Client4.doFetch<any>(
+        `${Client4.getBaseRoute()}/extchat/${externalPlatform}/linkAccount${buildQueryString({externalId})}`,
+        {method: 'post'},
+    );
+}
+
 export default {createPrivateEmoji, getEmojiUrl, getPrivateEmojis, searchPrivateEmoji, checkEmojiAccess, savePrivateEmoji, deleteEmojiWithAccess, removeEmojiAccess};
