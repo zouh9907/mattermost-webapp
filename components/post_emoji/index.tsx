@@ -3,7 +3,9 @@
 
 import {connect} from 'react-redux';
 
-import {getEmojiImageUrl} from 'mattermost-redux/utils/emoji_utils';
+import {getCurrentUserId} from 'mattermost-redux/selectors/entities/users';
+
+import {checkEmojiAccess, savePrivateEmoji, getEmojiUrl} from 'casualchat/CasualChatClient';
 
 import {getEmojiMap} from 'selectors/emojis';
 
@@ -13,14 +15,22 @@ import PostEmoji from './post_emoji';
 
 type Props = {
     name: string;
+    userId: string;
 };
 
 function mapStateToProps(state: GlobalState, ownProps: Props) {
     const emojiMap = getEmojiMap(state);
     const emoji = emojiMap.get(ownProps.name);
+    const currentUserId = getCurrentUserId(state);
 
     return {
-        imageUrl: emoji ? getEmojiImageUrl(emoji) : '',
+        imageUrl: emoji ? getEmojiUrl(emoji) : '',
+        emoji,
+        viewerUserId: currentUserId,
+        clientFuncs: {
+            checkEmojiAccess,
+            savePrivateEmoji
+        }
     };
 }
 

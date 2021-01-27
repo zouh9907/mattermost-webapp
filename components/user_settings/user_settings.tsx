@@ -5,6 +5,8 @@ import React from 'react';
 
 import {UserProfile} from 'mattermost-redux/types/users';
 
+import ExtChatTab from 'casualchat/components/user_setting/extchat';
+
 import AdvancedTab from './advanced';
 import DisplayTab from './display';
 import GeneralTab from './general';
@@ -43,6 +45,19 @@ export default class UserSettings extends React.PureComponent<Props, {}> {
             return (
                 <div>
                     <SecurityTab
+                        user={this.props.user}
+                        activeSection={this.props.activeSection}
+                        updateSection={this.props.updateSection}
+                        closeModal={this.props.closeModal}
+                        collapseModal={this.props.collapseModal}
+                        setRequireConfirm={this.props.setRequireConfirm}
+                    />
+                </div>
+            );
+        } else if (this.props.activeTab === 'extchat') {
+            return (
+                <div>
+                    <ExtChatTab
                         user={this.props.user}
                         activeSection={this.props.activeSection}
                         updateSection={this.props.updateSection}

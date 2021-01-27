@@ -6,6 +6,8 @@ import React from 'react';
 import {FormattedMessage} from 'react-intl';
 import {Link} from 'react-router-dom';
 
+import {If, Else, Then} from 'react-if';
+
 import BackstageHeader from 'components/backstage/components/backstage_header.jsx';
 import FormError from 'components/form_error';
 import SpinnerButton from 'components/spinner_button';
@@ -16,10 +18,12 @@ export default class AddEmoji extends React.PureComponent {
     static propTypes = {
         actions: PropTypes.shape({
             createCustomEmoji: PropTypes.func.isRequired,
+            createPrivateEmoji: PropTypes.func.isRequired,
         }).isRequired,
         emojiMap: PropTypes.object.isRequired,
         team: PropTypes.object,
         user: PropTypes.object,
+        shouldUploadPrivate: PropTypes.bool.isRequired,
     };
 
     static contextTypes = {
@@ -39,7 +43,7 @@ export default class AddEmoji extends React.PureComponent {
     }
 
     handleSubmit = async (e) => {
-        const {actions, emojiMap, user, team} = this.props;
+        const {actions, shouldUploadPrivate, emojiMap, user, team} = this.props;
         const {image, name, saving} = this.state;
 
         e.preventDefault();
@@ -114,17 +118,48 @@ export default class AddEmoji extends React.PureComponent {
 
             return;
         }
-
-        const {error} = await actions.createCustomEmoji(emoji, image);
-        if (error) {
-            this.setState({
-                saving: false,
-                error: error.message,
-            });
-            return;
+        let response;
+        if (shouldUploadPrivate) {
+            response = await actions.createPrivateEmoji(emoji, image);
+        } else {
+            response = await actions.createCustomEmoji(emoji, image);
         }
 
-        browserHistory.push('/' + team.name + '/emoji');
+        if ('data' in response) {
+            const savedEmoji = response;
+            if (savedEmoji && savedEmoji.data.name === emoji.name) {
+                if (shouldUploadPrivate) {
+                    browserHistory.push('/' + team.name + '/emoji_private');
+                } else {
+                    browserHistory.push('/' + team.name + '/emoji');
+                }
+                return;
+            }
+        }
+
+        if ('error' in response) {
+            const responseError = response;
+            if (responseError) {
+                this.setState({
+                    saving: false,
+                    error: responseError.error.message,
+                });
+
+                return;
+            }
+        }
+
+        const genericError = (
+            <FormattedMessage
+                id='add_emoji.failedToAdd'
+                defaultMessage='Something when wrong when adding the custom emoji.'
+            />
+        );
+
+        this.setState({
+            saving: false,
+            error: (genericError),
+        });
     };
 
     updateName = (e) => {
@@ -198,18 +233,38 @@ export default class AddEmoji extends React.PureComponent {
 
         return (
             <div className='backstage-content row'>
-                <BackstageHeader>
-                    <Link to={'/' + this.props.team.name + '/emoji'}>
-                        <FormattedMessage
-                            id='emoji_list.header'
-                            defaultMessage='Custom Emoji'
-                        />
-                    </Link>
-                    <FormattedMessage
-                        id='add_emoji.header'
-                        defaultMessage='Add'
-                    />
-                </BackstageHeader>
+
+                <If condition={this.props.shouldUploadPrivate}>
+                    <Then>
+                        <BackstageHeader>
+                            <Link to={'/' + this.props.team.name + '/emoji_private'}>
+                                <FormattedMessage
+                                    id='emoji_list.header-private'
+                                    defaultMessage='Private Emoji'
+                                />
+                            </Link>
+                            <FormattedMessage
+                                id='add_emoji.header'
+                                defaultMessage='Add'
+                            />
+                        </BackstageHeader>
+                    </Then>
+                    <Else>
+                        <BackstageHeader>
+                            <Link to={'/' + this.props.team.name + '/emoji'}>
+                                <FormattedMessage
+                                    id='emoji_list.header'
+                                    defaultMessage='Public Emoji'
+                                />
+                            </Link>
+                            <FormattedMessage
+                                id='add_emoji.header'
+                                defaultMessage='Add'
+                            />
+                        </BackstageHeader>
+                    </Else>
+                </If>
+
                 <div className='backstage-form'>
                     <form
                         className='form-horizontal'
@@ -287,7 +342,7 @@ export default class AddEmoji extends React.PureComponent {
                             />
                             <Link
                                 className='btn btn-link btn-sm'
-                                to={'/' + this.props.team.name + '/emoji'}
+                                to={this.props.shouldUploadPrivate ? ('/' + this.props.team.name + '/emoji_private') : ('/' + this.props.team.name + '/emoji')}
                             >
                                 <FormattedMessage
                                     id='add_emoji.cancel'

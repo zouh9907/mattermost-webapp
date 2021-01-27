@@ -34,6 +34,10 @@ const holders = defineMessages({
         id: t('user.settings.modal.security'),
         defaultMessage: 'Security',
     },
+    extchat: {
+        id: t('user.settings.modal.extchat'),
+        defaultMessage: 'External Chat',
+    },
     notifications: {
         id: t('user.settings.modal.notifications'),
         defaultMessage: 'Notifications',
@@ -283,6 +287,7 @@ class UserSettingsModal extends React.PureComponent<Props, State> {
         tabs.push({name: 'display', uiName: formatMessage(holders.display), icon: 'icon fa fa-eye', iconTitle: Utils.localizeMessage('user.settings.display.icon', 'Display Settings Icon')});
         tabs.push({name: 'sidebar', uiName: formatMessage(holders.sidebar), icon: 'icon fa fa-columns', iconTitle: Utils.localizeMessage('user.settings.sidebar.icon', 'Sidebar Settings Icon')});
         tabs.push({name: 'advanced', uiName: formatMessage(holders.advanced), icon: 'icon fa fa-list-alt', iconTitle: Utils.localizeMessage('user.settings.advance.icon', 'Advanced Settings Icon')});
+        tabs.push({name: 'extchat', uiName: formatMessage(holders.extchat), icon: 'icon fa fa-list-alt', iconTitle: Utils.localizeMessage('user.settings.extchat.icon', 'External Chat Settings Icon')});
 
         return (
             <Modal

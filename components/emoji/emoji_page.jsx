@@ -73,7 +73,10 @@ export default class EmojiPage extends React.PureComponent {
                         </Link>
                     </AnyTeamPermissionGate>
                 </div>
-                <EmojiList scrollToTop={this.props.scrollToTop}/>
+                <EmojiList
+                    scrollToTop={this.props.scrollToTop}
+                    isPrivate={false}
+                />
             </div>
         );
     }

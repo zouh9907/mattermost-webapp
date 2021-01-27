@@ -25,6 +25,7 @@ const DEV = targetIsRun || targetIsStats || targetIsDevServer;
 
 const STANDARD_EXCLUDE = [
     path.join(__dirname, 'node_modules'),
+    path.join(__dirname, 'casualchat/tdweb/prebuilt'),
 ];
 
 // react-hot-loader requires eval
@@ -140,8 +141,26 @@ var config = {
         filename: '[name].[hash].js',
         chunkFilename: '[name].[contenthash].js',
     },
+    node: {
+        dgram: 'empty',
+        fs: 'empty',
+        net: 'empty',
+        tls: 'empty',
+        crypto: 'empty',
+        child_process: 'empty',
+    },
     module: {
+        noParse: /td_asmjs\.js$/,
         rules: [
+            {
+                test: /worker\.(js|jsx)$/,
+                include: [path.resolve(__dirname, 'casualchat/tdweb')],
+                use: [
+                    {
+                        loader: 'worker-loader',
+                    },
+                ],
+            },
             {
                 test: /\.(js|jsx|ts|tsx)?$/,
                 exclude: STANDARD_EXCLUDE,
@@ -154,7 +173,17 @@ var config = {
                     },
                 },
             },
+
             {
+                test: /\.(wasm|mem)$/,
+                include: [path.resolve(__dirname, 'casualchat/tdweb/prebuilt/release')],
+                type: 'javascript/auto',
+                use: [
+                    {
+                        loader: 'file-loader',
+                    },
+                ],
+            }, {
                 type: 'javascript/auto',
                 test: /\.json$/,
                 include: [
@@ -290,6 +319,8 @@ var config = {
                 {from: 'images/warning.png', to: 'images'},
                 {from: 'images/logo-email.png', to: 'images'},
                 {from: 'images/browser-icons', to: 'images/browser-icons'},
+
+                //{from: 'casualchat/tdweb', to: '.'}
             ],
         }),
 
